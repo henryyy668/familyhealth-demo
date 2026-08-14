@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#F4F0E9">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<title>HealthStory</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --cream:#F4F0E9; --card:#FFFFFF; --ink:#22271F; --muted:#6E7568;
+  --green:#175E4C; --green-deep:#0E4235; --green-soft:#DCE9E1;
+  --amber:#B87514; --amber-deep:#7A4C0A; --amber-soft:#F6E7CC;
+  --line:#E3DDD1; --r:14px;
+  --sans:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Noto Sans SC","Microsoft YaHei",sans-serif;
+  --disp:'Fraunces',Georgia,serif;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+html,body{height:100%;}
+body{background:var(--cream);color:var(--ink);font-family:var(--sans);display:flex;justify-content:center;}
+.app{width:100%;max-width:460px;height:100dvh;display:flex;flex-direction:column;padding:12px 12px 0;}
+
+header{display:flex;align-items:center;justify-content:space-between;padding:4px 2px 12px;flex-shrink:0;}
+.brand{display:flex;align-items:center;gap:8px;}
+.orbit{width:26px;height:26px;position:relative;}
+.orbit .core{position:absolute;inset:8px;border-radius:50%;background:var(--green);}
+.orbit .ring{position:absolute;inset:0;border:1.5px solid var(--green);border-radius:50%;border-top-color:transparent;transform:rotate(-30deg);}
+.brand span{font-family:var(--disp);font-weight:600;font-size:17px;}
+.tabs{display:flex;background:#EAE4D8;border-radius:999px;padding:3px;}
+.tabs button{position:relative;padding:6px 18px;font-size:13px;border-radius:999px;color:var(--muted);border:none;background:transparent;font-family:var(--sans);cursor:pointer;}
+.tabs button.on{background:var(--card);color:var(--ink);font-weight:500;box-shadow:0 1px 2px rgba(0,0,0,.06);}
+.tabs button .dot{position:absolute;top:4px;right:8px;width:7px;height:7px;border-radius:50%;background:var(--amber);display:none;}
+.tabs button .dot.show{display:block;}
+
+.page{flex:1;min-height:0;display:none;flex-direction:column;}
+.page.on{display:flex;}
+
+/* ---------- Ask ---------- */
+#chat{flex:1;overflow-y:auto;padding:4px 2px 12px;-webkit-overflow-scrolling:touch;}
+.msg{max-width:85%;margin-bottom:10px;padding:11px 14px;border-radius:16px;font-size:14px;line-height:1.65;white-space:pre-wrap;}
+.msg.bot{background:var(--card);border:1px solid var(--line);border-top-left-radius:6px;}
+.msg.user{background:var(--green);color:#fff;margin-left:auto;border-top-right-radius:6px;}
+.chips{display:flex;flex-wrap:wrap;gap:7px;margin:2px 0 12px;}
+.chips button{padding:8px 14px;font-size:13px;font-family:var(--sans);border:1.5px solid var(--green);color:var(--green-deep);background:#fff;border-radius:999px;cursor:pointer;}
+.chips button:active{background:var(--green-soft);}
+.icard{background:var(--card);border:1.5px solid var(--green);border-radius:var(--r);padding:14px;margin-bottom:12px;max-width:95%;}
+.icard h3{font-size:14px;font-weight:500;margin-bottom:10px;display:flex;align-items:center;gap:7px;}
+.icard h3 i{width:8px;height:8px;border-radius:50%;background:var(--green);}
+.irow{display:flex;justify-content:space-between;font-size:13px;padding:5px 0;border-bottom:1px dashed var(--line);}
+.irow:last-of-type{border-bottom:none;}
+.irow span:first-child{color:var(--muted);}
+.icard .go{width:100%;margin-top:12px;padding:13px;font-size:15px;font-weight:500;font-family:var(--sans);background:var(--green);color:#fff;border:none;border-radius:11px;cursor:pointer;}
+.inputbar{display:flex;gap:8px;padding:10px 0 max(12px, env(safe-area-inset-bottom));flex-shrink:0;}
+.inputbar input{flex:1;padding:12px 15px;font-size:15px;font-family:var(--sans);border:1.5px solid var(--line);border-radius:999px;background:#fff;outline:none;}
+.inputbar input:focus{border-color:var(--green);}
+.inputbar button{width:46px;height:46px;border-radius:50%;border:none;background:var(--green);color:#fff;font-size:17px;cursor:pointer;flex-shrink:0;}
+
+/* ---------- Booking ---------- */
+#bookScroll{flex:1;overflow-y:auto;padding-bottom:max(14px, env(safe-area-inset-bottom));-webkit-overflow-scrolling:touch;}
+.empty{background:var(--card);border:1px dashed #C9C2B2;border-radius:var(--r);padding:28px 18px;text-align:center;color:var(--muted);font-size:14px;line-height:1.8;margin-top:8px;}
+.empty button{margin-top:12px;padding:11px 22px;font-size:14px;font-family:var(--sans);background:var(--green);color:#fff;border:none;border-radius:999px;cursor:pointer;}
+.status{margin-bottom:12px;}
+.phase{display:inline-flex;align-items:center;gap:6px;font-size:11px;letter-spacing:.1em;padding:3px 10px;border-radius:999px;margin-bottom:6px;}
+.phase.agent{background:var(--green-soft);color:var(--green-deep);}
+.phase.user{background:var(--amber-soft);color:var(--amber-deep);}
+.phase .pulse{width:7px;height:7px;border-radius:50%;background:currentColor;}
+@media (prefers-reduced-motion: no-preference){
+  .pulse{animation:blink 1.4s ease-in-out infinite;}
+  @keyframes blink{50%{opacity:.35;}}
+  .cursor{animation:hunt 5s ease-in-out infinite;}
+  @keyframes hunt{0%{transform:translate(30px,80px);}25%{transform:translate(210px,110px);}50%{transform:translate(110px,190px);}75%{transform:translate(240px,240px);}100%{transform:translate(30px,80px);}}
+}
+.status h1{font-size:24px;font-weight:600;line-height:1.25;}
+.status .desc{font-size:13px;color:var(--muted);margin-top:3px;line-height:1.6;}
+.steps{display:flex;gap:5px;margin-top:10px;}
+.steps i{flex:1;height:4px;border-radius:2px;background:#DDD6C7;}
+.steps i.done{background:var(--green);}
+.steps i.cur{background:var(--green);opacity:.45;}
+.steps.user-cur i.cur{background:var(--amber);opacity:.6;}
+.step-names{display:flex;justify-content:space-between;font-size:10px;color:#A9A294;margin-top:5px;}
+
+.live{background:var(--card);border-radius:var(--r);overflow:hidden;border:2px solid var(--green);transition:border-color .3s;}
+.live.user-mode{border-color:var(--amber);}
+.chrome{display:flex;align-items:center;gap:8px;padding:8px 12px;background:#FAF7F1;border-bottom:1px solid var(--line);}
+.chrome .url{flex:1;font-size:11px;color:var(--muted);background:#EFEAE0;border-radius:999px;padding:4px 12px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;}
+.badge{font-size:10px;letter-spacing:.08em;padding:3px 8px;border-radius:4px;font-weight:500;}
+.badge.agent{background:var(--green);color:#fff;}
+.badge.user{background:var(--amber);color:#fff;}
+.viewport{position:relative;min-height:320px;padding:14px;}
+.site-h{height:32px;background:#F0EDE6;border-radius:8px;margin-bottom:12px;display:flex;align-items:center;padding:0 12px;font-size:12px;color:#B0AA9C;}
+.doc{display:flex;gap:10px;padding:10px;border:1px solid var(--line);border-radius:10px;margin-bottom:9px;background:#fff;opacity:0;transition:opacity .4s;}
+.doc.in{opacity:1;}
+.doc.dim{opacity:.4;}
+.doc .av{width:38px;height:38px;border-radius:50%;background:#E4DFD3;flex-shrink:0;}
+.doc .nm{font-size:13px;font-weight:500;}
+.doc .sub{font-size:11px;color:var(--muted);margin-top:2px;}
+.slotrow{display:flex;gap:5px;margin-top:6px;flex-wrap:wrap;}
+.slot{font-size:11px;padding:4px 9px;border-radius:6px;background:var(--green-soft);color:var(--green-deep);border:1.5px solid transparent;cursor:pointer;}
+.slot.sel{border-color:var(--amber);background:#FDF9F0;color:var(--amber-deep);font-weight:500;}
+.cursor{position:absolute;width:14px;height:14px;pointer-events:none;z-index:5;}
+.cursor::before{content:"";position:absolute;inset:3px;background:var(--green);border-radius:50%;}
+.cursor::after{content:"";position:absolute;inset:-4px;border:1.5px solid var(--green);border-radius:50%;opacity:.5;}
+
+.sheet{background:#fff;border:1.5px solid var(--line);border-radius:14px;padding:13px;margin-top:4px;}
+.sheet h3{font-size:14px;font-weight:500;margin-bottom:10px;line-height:1.5;}
+.cand{border:1.5px solid var(--line);border-radius:10px;padding:11px;margin-bottom:8px;cursor:pointer;}
+.cand.sel{border-color:var(--amber);background:#FDF9F0;}
+.cand .row{display:flex;justify-content:space-between;align-items:baseline;}
+.cand .nm{font-size:13px;font-weight:500;}
+.cand .fit{font-size:11px;color:var(--amber-deep);}
+.cand .why{font-size:11px;color:var(--muted);margin-top:3px;line-height:1.5;}
+
+.formmock label{display:block;font-size:11px;color:var(--muted);margin-bottom:4px;}
+.formmock .fv{padding:9px 11px;font-size:14px;border:1.5px solid var(--line);border-radius:8px;background:#FCFBF8;margin-bottom:10px;min-height:38px;}
+.formmock .fv.typing{border-color:var(--green);}
+
+.login{max-width:290px;margin:14px auto 0;}
+.login h4{font-size:14px;font-weight:500;margin-bottom:12px;text-align:center;}
+.field{margin-bottom:10px;}
+.field label{display:block;font-size:11px;color:var(--muted);margin-bottom:4px;}
+.field input{width:100%;padding:10px 12px;font-size:14px;font-family:var(--sans);border:1.5px solid var(--amber);border-radius:8px;background:#FFFDF8;outline:none;}
+.ferr{font-size:12px;color:#A32D2D;margin-top:3px;display:none;}
+.shield{display:flex;gap:8px;align-items:flex-start;margin-top:14px;padding:10px;background:var(--amber-soft);border-radius:10px;font-size:11px;color:var(--amber-deep);line-height:1.6;}
+.shield svg{flex-shrink:0;margin-top:1px;}
+
+.review{padding:4px 2px;}
+.review h4{font-size:14px;font-weight:500;margin:6px 0 10px;}
+.rrow{display:flex;justify-content:space-between;font-size:13px;padding:7px 0;border-bottom:1px dashed var(--line);}
+.rrow span:first-child{color:var(--muted);}
+.success{text-align:center;padding:26px 10px 10px;}
+.success .ok{width:52px;height:52px;border-radius:50%;background:var(--green);color:#fff;font-size:26px;display:flex;align-items:center;justify-content:center;margin:0 auto 14px;}
+.success h4{font-size:17px;font-weight:600;margin-bottom:6px;}
+.success p{font-size:13px;color:var(--muted);line-height:1.7;}
+
+.actions{margin-top:12px;display:flex;flex-direction:column;gap:8px;}
+.btn{width:100%;padding:14px;font-size:15px;font-weight:500;font-family:var(--sans);border-radius:12px;border:none;cursor:pointer;}
+.btn.pg{background:var(--green);color:#fff;}
+.btn.pa{background:var(--amber);color:#fff;}
+.btn.ghost{background:transparent;border:1.5px solid var(--line);color:var(--muted);}
+.meta{display:flex;justify-content:space-between;font-size:11px;color:#A9A294;margin-top:10px;}
+.meta button{border:none;background:none;font-size:11px;color:#A9A294;text-decoration:underline;cursor:pointer;font-family:var(--sans);}
+#logbox{display:none;background:#fff;border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin-top:8px;max-height:160px;overflow-y:auto;}
+#logbox div{font-size:11px;color:var(--muted);padding:3px 0;border-bottom:1px dashed #EFEAE0;font-variant-numeric:tabular-nums;}
+.hidden{display:none !important;}
+</style>
+</head>
+<body>
+<div class="app">
+
+<header>
+  <div class="brand"><div class="orbit"><div class="ring"></div><div class="core"></div></div><span>HealthStory</span></div>
+  <nav class="tabs">
+    <button id="tab-ask" class="on" onclick="switchTab('ask')">Ask</button>
+    <button id="tab-book" onclick="switchTab('book')">预约<span class="dot" id="bookDot"></span></button>
+  </nav>
+</header>
+
+<!-- ============ ASK ============ -->
+<div class="page on" id="page-ask">
+  <div id="chat"></div>
+  <div class="inputbar">
+    <input id="askInput" type="text" placeholder="描述症状,或直接说想约的科室" autocomplete="off">
+    <button onclick="userSend()" aria-label="发送">↑</button>
+  </div>
+</div>
+
+<!-- ============ BOOKING ============ -->
+<div class="page" id="page-book">
+  <div id="bookScroll">
+    <div class="empty" id="bookEmpty">
+      还没有预约意图。<br>先去 Ask 说说你的需求,我来整理成预约条件。
+      <br><button onclick="switchTab('ask')">去 Ask</button>
+    </div>
+    <div id="bookMain" class="hidden">
+      <section class="status">
+        <span id="phase" class="phase agent"><i class="pulse"></i><span id="phaseT">AGENT 正在操作</span></span>
+        <h1 id="stateT">意图就绪</h1>
+        <p class="desc" id="stateD"></p>
+        <div class="steps" id="steps"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+        <div class="step-names"><span>意图</span><span>搜索</span><span>确认</span><span>填表</span><span>敏感</span><span>审查</span><span>提交</span></div>
+      </section>
+      <section class="live" id="live">
+        <div class="chrome">
+          <span class="url" id="liveUrl">zocdoc.com</span>
+          <span class="badge agent" id="badge">待命</span>
+        </div>
+        <div class="viewport" id="viewport"></div>
+      </section>
+      <section class="actions" id="act"></section>
+      <div class="meta">
+        <span id="metaL">会话未开始</span>
+        <button onclick="toggleLog()">查看操作日志</button>
+      </div>
+      <div id="logbox"></div>
+    </div>
+  </div>
+</div>
+
+</div>
+
+<script>
+/* ================= 后端接入位 =================
+   mode 改为 'live' 并填入你们的服务地址后,
+   Agent 引擎会把 mock 时间线换成真实会话流。 */
+const BACKEND = {
+  mode: 'mock',
+  endpoints: {
+    intent:  '/api/intent',            // Ask 意图解析(接 LLM)
+    session: '/api/booking/session',   // 创建预约会话(Browserbase)
+    liveView:''                        // live view iframe 地址
+  }
+};
+
+const store = {
+  get(k){ try{ return JSON.parse(localStorage.getItem('hs_'+k)); }catch(e){ return null; } },
+  set(k,v){ try{ localStorage.setItem('hs_'+k, JSON.stringify(v)); }catch(e){} }
+};
+
+/* ================= Mock 数据 ================= */
+const SPECIALTIES = {
+  '皮肤科':{en:'dermatology', kw:['皮肤','痘','疹','痒','斑','湿疹','痣']},
+  '牙科':{en:'dentistry', kw:['牙','口腔','智齿','洗牙']},
+  '眼科':{en:'ophthalmology', kw:['眼','视力','近视','干眼']},
+  '生殖医学':{en:'fertility / IVF', kw:['生育','ivf','备孕','试管','不孕']},
+  '骨科':{en:'orthopedics', kw:['骨','关节','腰','膝','扭伤','颈椎']},
+  '全科':{en:'primary care', kw:['感冒','发烧','体检','头疼','咳嗽','全科']}
+};
+const MOCK_DOCS = {
+  '皮肤科':[
+    {n:'Dr. Sarah Chen', r:4.9, d:'2.1 mi', ins:true,  slots:['周三 10:30','周三 2:00','周五 11:15'], best:'收你的保险,距离最近,评分最高'},
+    {n:'Dr. Michael Torres', r:4.8, d:'3.4 mi', ins:true,  slots:['周四 3:15','周五 9:00'], best:'收你的保险,最早周四有号'},
+    {n:'Dr. Emily Park', r:4.6, d:'8.9 mi', ins:false, slots:[], best:''}
+  ],
+  default:[
+    {n:'Dr. James Wu', r:4.9, d:'1.8 mi', ins:true, slots:['周二 2:00','周三 10:00','周四 4:30'], best:'收你的保险,距离最近,评分最高'},
+    {n:'Dr. Ana Rivera', r:4.7, d:'4.2 mi', ins:true, slots:['周三 3:30','周五 10:15'], best:'收你的保险,时段选择多'},
+    {n:'Dr. David Kim', r:4.5, d:'7.6 mi', ins:false, slots:[], best:''}
+  ]
+};
+
+/* ================= Ask 对话引擎 ================= */
+let intent = { specialty:null, reason:null, urgency:null, location:null, insurance:null, timePref:null };
+let askStep = 'start';
+const chat = document.getElementById('chat');
+const askInput = document.getElementById('askInput');
+askInput.addEventListener('keydown', e=>{ if(e.key==='Enter') userSend(); });
+
+function pushBot(text, chips){
+  const m = document.createElement('div'); m.className='msg bot'; m.textContent=text; chat.appendChild(m);
+  if(chips && chips.length){
+    const c = document.createElement('div'); c.className='chips';
+    chips.forEach(ch=>{ const b=document.createElement('button'); b.textContent=ch; b.onclick=()=>{ c.remove(); handleUser(ch,true); }; c.appendChild(b); });
+    chat.appendChild(c);
+  }
+  chat.scrollTop = chat.scrollHeight;
+}
+function pushUser(text){
+  const m = document.createElement('div'); m.className='msg user'; m.textContent=text; chat.appendChild(m);
+  chat.scrollTop = chat.scrollHeight;
+}
+function userSend(){
+  const v = askInput.value.trim(); if(!v) return;
+  askInput.value=''; handleUser(v,false);
+}
+function matchSpecialty(t){
+  const low = t.toLowerCase();
+  for(const [name,cfg] of Object.entries(SPECIALTIES)){
+    if(t.includes(name.replace('科',''))||low.includes(cfg.en.split(' ')[0])) return name;
+    if(cfg.kw.some(k=>low.includes(k))) return name;
+  }
+  return null;
+}
+function handleUser(text, isChip){
+  pushUser(text);
+  setTimeout(()=>askFlow(text,isChip), 350);
+}
+function askFlow(text, isChip){
+  if(askStep==='start'){
+    const sp = matchSpecialty(text) || (SPECIALTIES[text] ? text : null);
+    if(sp){
+      intent.specialty = sp;
+      if(!isChip) intent.reason = text;
+      askStep='urgency';
+      pushBot(`明白,帮你约${sp}。多急?`, ['尽快(3 天内)','一周内','两周内','不急']);
+    } else {
+      pushBot('我还没对上科室,选一个,或再描述一下症状:', Object.keys(SPECIALTIES));
+    }
+  } else if(askStep==='urgency'){
+    intent.urgency = text; askStep='location';
+    const last = store.get('intent');
+    pushBot('去哪个区域看?输入 ZIP 或城市名。', last && last.location ? ['用上次的:'+last.location] : []);
+  } else if(askStep==='location'){
+    intent.location = text.replace('用上次的:',''); askStep='insurance';
+    const last = store.get('intent');
+    const chips = ['Blue Shield','Kaiser','Anthem','Aetna','自费'];
+    if(last && last.insurance && !chips.includes(last.insurance)) chips.unshift(last.insurance);
+    pushBot('用哪个保险?', chips);
+  } else if(askStep==='insurance'){
+    intent.insurance = text; askStep='time';
+    pushBot('时间偏好?', ['工作日上午','工作日下午','周末','都行']);
+  } else if(askStep==='time'){
+    intent.timePref = text; askStep='done';
+    store.set('intent', intent);
+    renderIntentCard();
+  } else {
+    pushBot('意图卡片已生成,可以去预约了。想改条件就说"重新开始"。', text.includes('重新') ? [] : ['重新开始']);
+    if(text.includes('重新')){ resetAsk(); }
+  }
+}
+function resetAsk(){
+  intent = { specialty:null, reason:null, urgency:null, location:null, insurance:null, timePref:null };
+  askStep='start';
+  pushBot('好,重新来。哪里不舒服,或想约什么科?', Object.keys(SPECIALTIES));
+}
+function renderIntentCard(){
+  const c = document.createElement('div'); c.className='icard';
+  c.innerHTML = `<h3><i></i>预约意图已就绪</h3>
+    <div class="irow"><span>科室</span><span>${intent.specialty}</span></div>
+    ${intent.reason?`<div class="irow"><span>原因</span><span>${intent.reason}</span></div>`:''}
+    <div class="irow"><span>紧急度</span><span>${intent.urgency}</span></div>
+    <div class="irow"><span>区域</span><span>${intent.location}</span></div>
+    <div class="irow"><span>保险</span><span>${intent.insurance}</span></div>
+    <div class="irow"><span>时间</span><span>${intent.timePref}</span></div>
+    <button class="go" onclick="startBooking()">去预约 · Agent 接手</button>`;
+  chat.appendChild(c);
+  chat.scrollTop = chat.scrollHeight;
+  document.getElementById('bookDot').classList.add('show');
+  pushBot('确认无误就点"去预约",到关键步骤我会停下来等你确认。');
+}
+
+/* ================= Booking 状态机 ================= */
+const B = {
+  state:'idle', timers:[], startTs:null, tick:null,
+  doctor:null, slot:null, log:[]
+};
+const $ = id=>document.getElementById(id);
+function later(fn,ms){ const t=setTimeout(fn,ms); B.timers.push(t); }
+function clearTimers(){ B.timers.forEach(clearTimeout); B.timers=[]; }
+function logAdd(t){
+  const ts = new Date().toLocaleTimeString('zh-CN',{hour12:false});
+  B.log.push(ts+' · '+t);
+  const box = $('logbox');
+  const d = document.createElement('div'); d.textContent = ts+' · '+t;
+  box.appendChild(d); box.scrollTop = box.scrollHeight;
+}
+function toggleLog(){ const b=$('logbox'); b.style.display = b.style.display==='block'?'none':'block'; }
+function setStatus(o){
+  $('phase').className = 'phase '+o.phase;
+  $('phaseT').textContent = o.phaseT;
+  $('stateT').textContent = o.title;
+  $('stateD').textContent = o.desc;
+  const steps = $('steps');
+  steps.className = 'steps' + (o.phase==='user'?' user-cur':'');
+  [...steps.children].forEach((el,i)=>{ el.className = i<o.step?'done':(i===o.step?'cur':''); });
+  $('live').className = 'live' + (o.phase==='user'?' user-mode':'');
+  const bd = $('badge'); bd.className='badge '+o.phase; bd.textContent = o.badge;
+  if(o.url) $('liveUrl').textContent = o.url;
+  $('act').innerHTML = o.act || '';
+}
+function startTimer(){
+  B.startTs = Date.now();
+  if(B.tick) clearInterval(B.tick);
+  B.tick = setInterval(()=>{
+    const s = Math.floor((Date.now()-B.startTs)/1000);
+    $('metaL').textContent = `会话 #${String(B.startTs).slice(-4)} · 已运行 ${Math.floor(s/60)}:${String(s%60).padStart(2,'0')}`;
+  }, 1000);
+}
+function switchTab(t){
+  $('tab-ask').classList.toggle('on', t==='ask');
+  $('tab-book').classList.toggle('on', t==='book');
+  $('page-ask').classList.toggle('on', t==='ask');
+  $('page-book').classList.toggle('on', t==='book');
+  if(t==='book') $('bookDot').classList.remove('show');
+}
+function startBooking(){
+  switchTab('book');
+  $('bookEmpty').classList.add('hidden');
+  $('bookMain').classList.remove('hidden');
+  stReady();
+}
+
+/* ---- 状态:意图就绪 ---- */
+function stReady(){
+  B.state='ready';
+  setStatus({phase:'agent', phaseT:'待命', title:'意图就绪', step:0, badge:'待命', url:'zocdoc.com',
+    desc:`${intent.specialty} · ${intent.location} · ${intent.insurance} · ${intent.timePref}`,
+    act:'<button class="btn pg" onclick="stSearch()">开始自动预约</button><button class="btn ghost" onclick="switchTab(\'ask\')">回 Ask 改条件</button>'});
+  $('viewport').innerHTML = '<div class="site-h">Agent 待命中,点击下方开始</div>';
+}
+
+/* ---- 状态:搜索医生(agent) ---- */
+function stSearch(){
+  B.state='search'; clearTimers();
+  if(!B.startTs) startTimer();
+  const spec = intent.specialty;
+  setStatus({phase:'agent', phaseT:'AGENT 正在操作', title:'搜索医生', step:1, badge:'LIVE',
+    url:`zocdoc.com/search?spec=${encodeURIComponent(spec)}`,
+    desc:`按你的条件筛选:${spec} · ${intent.location} 附近 · ${intent.insurance}`,
+    act:'<button class="btn ghost" onclick="pauseAgent()">暂停,我来接管</button>'});
+  const docs = MOCK_DOCS[spec] || MOCK_DOCS.default;
+  const vp = $('viewport');
+  vp.innerHTML = `<div class="site-h">正在加载搜索结果…</div><div id="doclist"></div><div class="cursor"></div>`;
+  logAdd('打开 Zocdoc,输入科室与区域');
+  later(()=>{ vp.querySelector('.site-h').textContent = `搜索结果 · ${spec}`; logAdd('提交筛选:'+intent.insurance); }, 1000);
+  docs.forEach((d,i)=>{
+    later(()=>{
+      const el = document.createElement('div');
+      el.className='doc';
+      el.innerHTML = `<div class="av"></div><div><div class="nm">${d.n}</div><div class="sub">${spec} · ${d.r} ★ · ${d.d}${d.ins?'':' · 不收 '+intent.insurance}</div>${d.slots.length?`<div class="slotrow">${d.slots.slice(0,2).map(s=>`<span class="slot">${s}</span>`).join('')}</div>`:''}</div>`;
+      $('doclist').appendChild(el);
+      requestAnimationFrame(()=>el.classList.add('in'));
+      if(!d.ins) later(()=>{ el.classList.add('dim'); logAdd('排除 '+d.n+'(保险不匹配)'); }, 700);
+    }, 1600 + i*800);
+  });
+  later(()=>{ logAdd('按评分与距离排序,选出候选'); stGate(docs.filter(d=>d.ins)); }, 5200);
+}
+
+/* ---- 状态:确认医生(user 关卡 1) ---- */
+function stGate(cands){
+  B.state='gate'; clearTimers();
+  B.doctor = cands[0]; B.slot = cands[0].slots[0];
+  setStatus({phase:'user', phaseT:'等待你确认', title:'确认医生', step:2, badge:'已暂停',
+    desc:'关卡 1 · 你选定医生和时段后,Agent 才继续填表',
+    act:'<button class="btn pa" onclick="stForm()">选定,继续预约</button><button class="btn ghost" onclick="stSearch()">都不合适,重新搜索</button>'});
+  const vp = $('viewport');
+  vp.innerHTML = `<div class="sheet"><h3>Agent 找到 ${cands.length} 位符合条件的医生,请选定医生和时段</h3>
+    ${cands.map((d,i)=>`
+      <div class="cand ${i===0?'sel':''}" data-i="${i}">
+        <div class="row"><span class="nm">${d.n}</span><span class="fit">${i===0?'最匹配':''}</span></div>
+        <p class="why">${d.r} ★ · ${d.d} · 收 ${intent.insurance} · ${d.best}</p>
+        <div class="slotrow">${d.slots.map((s,j)=>`<span class="slot ${i===0&&j===0?'sel':''}" data-i="${i}" data-s="${s}">${s}</span>`).join('')}</div>
+      </div>`).join('')}
+  </div>`;
+  vp.querySelectorAll('.cand').forEach(c=>{
+    c.addEventListener('click', ()=>{
+      vp.querySelectorAll('.cand').forEach(x=>x.classList.remove('sel'));
+      c.classList.add('sel');
+      const i = +c.dataset.i; B.doctor = cands[i]; B.slot = cands[i].slots[0];
+      vp.querySelectorAll('.slot').forEach(s=>s.classList.toggle('sel', s.dataset.i==c.dataset.i && s.dataset.s===B.slot));
+    });
+  });
+  vp.querySelectorAll('.slot').forEach(s=>{
+    s.addEventListener('click', e=>{
+      e.stopPropagation();
+      const i = +s.dataset.i; B.doctor = cands[i]; B.slot = s.dataset.s;
+      vp.querySelectorAll('.cand').forEach(x=>x.classList.toggle('sel', +x.dataset.i===i));
+      vp.querySelectorAll('.slot').forEach(x=>x.classList.remove('sel'));
+      s.classList.add('sel');
+    });
+  });
+  logAdd('等待用户确认医生(关卡 1)');
+}
+
+/* ---- 状态:填写表单(agent) ---- */
+function stForm(){
+  B.state='form'; clearTimers();
+  logAdd(`用户选定 ${B.doctor.n} · ${B.slot}`);
+  setStatus({phase:'agent', phaseT:'AGENT 正在操作', title:'填写表单', step:3, badge:'LIVE',
+    url:'zocdoc.com/booking/new-patient',
+    desc:'Agent 填写非敏感字段,敏感信息稍后由你亲手输入',
+    act:'<button class="btn ghost" onclick="pauseAgent()">暂停,我来接管</button>'});
+  const vp = $('viewport');
+  const fields = [
+    ['预约医生', B.doctor.n + ' · ' + B.slot],
+    ['就诊原因', intent.reason || intent.specialty],
+    ['患者类型', '新患者'],
+    ['时间偏好', intent.timePref]
+  ];
+  vp.innerHTML = `<div class="formmock">${fields.map((f,i)=>`<label>${f[0]}</label><div class="fv" id="fv${i}"></div>`).join('')}</div>`;
+  fields.forEach((f,i)=>{
+    later(()=>{
+      const el = $('fv'+i); el.classList.add('typing');
+      let k=0; const iv = setInterval(()=>{
+        el.textContent = f[1].slice(0,++k);
+        if(k>=f[1].length){ clearInterval(iv); el.classList.remove('typing'); }
+      }, 28);
+      B.timers.push(iv);
+      logAdd('填写:'+f[0]);
+    }, 500 + i*950);
+  });
+  later(stSecure, 500 + fields.length*950 + 900);
+}
+
+/* ---- 状态:敏感输入(user) ---- */
+function stSecure(){
+  B.state='secure'; clearTimers();
+  setStatus({phase:'user', phaseT:'你正在操作', title:'敏感输入', step:4, badge:'接管中',
+    url:'zocdoc.com/signin',
+    desc:'登录与保险信息由你亲手输入,Agent 已回避此页面',
+    act:'<button class="btn pa" onclick="secureDone()">输入完成,交还 Agent</button>'});
+  $('viewport').innerHTML = `<div class="login">
+    <h4>登录 Zocdoc 并补全保险信息</h4>
+    <div class="field"><label>邮箱</label><input id="se" type="email" autocomplete="off" placeholder="you@example.com"><p class="ferr" id="ee">请填写邮箱</p></div>
+    <div class="field"><label>密码</label><input id="sp" type="password" placeholder="••••••••"><p class="ferr" id="ep">请填写密码</p></div>
+    <div class="field"><label>保险会员号(${intent.insurance})</label><input id="si" type="text" autocomplete="off" placeholder="Member ID"><p class="ferr" id="ei">请填写会员号</p></div>
+    <div class="shield">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l8 4v6c0 5-3.5 8.5-8 10-4.5-1.5-8-5-8-10V6l8-4z"/></svg>
+      <span>控制权在你手上。此页面的键盘输入不经过 Agent。当前为演示环境,这些内容不会上传或保存。</span>
+    </div>
+  </div>`;
+  logAdd('进入敏感输入,Agent 回避');
+}
+function secureDone(){
+  let ok = true;
+  [['se','ee'],['sp','ep'],['si','ei']].forEach(([f,e])=>{
+    const bad = !$(f).value.trim();
+    $(e).style.display = bad?'block':'none';
+    if(bad) ok=false;
+  });
+  if(!ok) return;
+  logAdd('用户完成敏感输入,交还 Agent');
+  stReview();
+}
+
+/* ---- 状态:最终审查(user 关卡 2) ---- */
+function stReview(){
+  B.state='review'; clearTimers();
+  setStatus({phase:'user', phaseT:'等待你确认', title:'最终审查', step:5, badge:'已暂停',
+    url:'zocdoc.com/booking/review',
+    desc:'关卡 2 · 这是提交前的最后一步,请核对全部信息',
+    act:'<button class="btn pa" onclick="stSubmit()">确认无误,提交预约</button><button class="btn ghost" onclick="stGateBack()">返回修改医生或时段</button>'});
+  $('viewport').innerHTML = `<div class="review">
+    <h4>预约信息核对</h4>
+    <div class="rrow"><span>医生</span><span>${B.doctor.n}</span></div>
+    <div class="rrow"><span>时段</span><span>${B.slot}</span></div>
+    <div class="rrow"><span>科室</span><span>${intent.specialty}</span></div>
+    <div class="rrow"><span>就诊原因</span><span>${intent.reason || intent.specialty}</span></div>
+    <div class="rrow"><span>区域</span><span>${intent.location} · ${B.doctor.d}</span></div>
+    <div class="rrow"><span>保险</span><span>${intent.insurance}</span></div>
+    <div class="rrow"><span>患者类型</span><span>新患者</span></div>
+  </div>`;
+  logAdd('等待用户最终确认(关卡 2)');
+}
+function stGateBack(){
+  const spec = intent.specialty;
+  const docs = (MOCK_DOCS[spec] || MOCK_DOCS.default).filter(d=>d.ins);
+  stGate(docs);
+}
+
+/* ---- 状态:提交(agent)→ 成功 ---- */
+function stSubmit(){
+  B.state='submit'; clearTimers();
+  setStatus({phase:'agent', phaseT:'AGENT 正在操作', title:'提交预约', step:6, badge:'LIVE',
+    url:'zocdoc.com/booking/confirm',
+    desc:'Agent 点击最终提交,等待网站确认',
+    act:''});
+  $('viewport').innerHTML = `<div class="site-h">提交中…</div><div class="cursor"></div>`;
+  logAdd('点击提交按钮');
+  later(()=>{ logAdd('收到网站确认页'); stSuccess(); }, 2400);
+}
+function stSuccess(){
+  B.state='done'; clearTimers();
+  if(B.tick) clearInterval(B.tick);
+  setStatus({phase:'agent', phaseT:'完成', title:'预约成功', step:7, badge:'完成',
+    url:'zocdoc.com/booking/confirmed',
+    desc:'确认邮件会发到你填写的邮箱',
+    act:'<button class="btn pg" onclick="backToAsk()">回到 Ask</button><button class="btn ghost" onclick="rebook()">再约一个</button>'});
+  const steps = $('steps');
+  [...steps.children].forEach(el=>el.className='done');
+  $('viewport').innerHTML = `<div class="success">
+    <div class="ok">✓</div>
+    <h4>已约上 ${B.doctor.n}</h4>
+    <p>${intent.specialty} · ${B.slot}<br>${intent.location} 附近 ${B.doctor.d} · ${intent.insurance}<br><br>全程 ${$('metaL').textContent.split('已运行 ')[1] || ''},共 2 次人工确认</p>
+  </div>`;
+  logAdd('预约成功,会话结束');
+  const done = store.get('bookings') || [];
+  done.push({doc:B.doctor.n, slot:B.slot, spec:intent.specialty, ts:Date.now()});
+  store.set('bookings', done);
+}
+function backToAsk(){
+  switchTab('ask');
+  pushBot(`✅ 预约成功:${B.doctor.n} · ${intent.specialty} · ${B.slot}。确认邮件稍后送达。还需要约别的吗?`, ['重新开始']);
+}
+function rebook(){ resetBookingKeepIntent(); }
+function resetBookingKeepIntent(){
+  B.doctor=null; B.slot=null; B.startTs=null;
+  $('metaL').textContent='会话未开始';
+  stReady();
+}
+
+/* ---- 暂停 / 接管 ---- */
+function pauseAgent(){
+  const prev = B.state;
+  clearTimers();
+  setStatus({phase:'user', phaseT:'你正在操作', title:'已接管', step:prev==='search'?1:3, badge:'接管中',
+    desc:'Agent 已暂停。真实环境下此处可直接操作网页;恢复后 Agent 会重新执行当前步骤',
+    act:`<button class="btn pa" onclick="${prev==='search'?'stSearch()':'stForm()'}">恢复,交还 Agent</button>`});
+  logAdd('用户暂停并接管');
+}
+
+/* ================= 启动 ================= */
+pushBot('你好,我是 HealthStory。哪里不舒服,或想约什么科?到选医生和提交这两个关键步骤,一定会停下来等你确认。', Object.keys(SPECIALTIES));
+</script>
+</body>
+</html>
