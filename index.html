@@ -26,7 +26,7 @@ body{background:var(--cream);color:var(--ink);font-family:var(--sans);display:fl
 
 header{display:flex;align-items:center;justify-content:space-between;padding:4px 2px 12px;flex-shrink:0;}
 .brand{display:flex;align-items:center;gap:8px;}
-.logo{display:block;flex-shrink:0;}
+.logo{display:block;flex-shrink:0;cursor:pointer;}
 .brand span{font-family:var(--disp);font-weight:600;font-size:17px;}
 .hr{display:flex;align-items:center;gap:8px;}
 .langbtn{min-width:38px;height:30px;padding:0 8px;border-radius:999px;border:1.5px solid var(--line);background:#fff;font-size:12px;font-family:var(--sans);color:var(--muted);cursor:pointer;}
@@ -34,7 +34,7 @@ header{display:flex;align-items:center;justify-content:space-between;padding:4px
 .bdot{position:absolute;top:2px;right:3px;width:8px;height:8px;border-radius:50%;background:var(--amber);border:1.5px solid var(--cream);display:none;}
 .bdot.show{display:block;}
 @media (max-width:409px){.brand span{display:none;}}
-#remview{position:fixed;inset:0;background:var(--cream);z-index:40;overflow-y:auto;-webkit-overflow-scrolling:touch;display:flex;justify-content:center;}
+#remview,#platview{position:fixed;inset:0;background:var(--cream);z-index:40;overflow-y:auto;-webkit-overflow-scrolling:touch;display:flex;justify-content:center;}
 .rv-wrap{width:100%;max-width:460px;padding:0 12px max(30px, env(safe-area-inset-bottom));}
 .rv-bar{position:sticky;top:0;background:var(--cream);display:flex;justify-content:space-between;align-items:center;padding:16px 2px 10px;z-index:2;}
 .rv-bar h3{font-size:18px;font-weight:600;}
@@ -104,6 +104,23 @@ header{display:flex;align-items:center;justify-content:space-between;padding:4px
 .badge.user{background:var(--amber);color:#fff;}
 .viewport{position:relative;min-height:320px;padding:14px;}
 .site-h{height:32px;background:#F0EDE6;border-radius:8px;margin-bottom:12px;display:flex;align-items:center;padding:0 12px;font-size:12px;color:#B0AA9C;}
+.chbadge{display:none;font-size:10px;letter-spacing:.04em;padding:3px 9px;border-radius:999px;margin-left:6px;vertical-align:2px;}
+.chbadge.api{display:inline-block;background:var(--green-soft);color:var(--green-deep);}
+.chbadge.web{display:inline-block;background:var(--amber-soft);color:var(--amber-deep);}
+.ledger{padding:4px 2px;}
+.lrow{display:flex;gap:9px;align-items:flex-start;font-size:13px;line-height:1.5;padding:9px 6px;border-bottom:1px dashed var(--line);}
+.lck{color:var(--green);font-weight:700;flex-shrink:0;}
+.pdot{display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:5px;}
+.pdot.green{background:var(--green);} .pdot.amber{background:var(--amber);} .pdot.gray{background:#B7B1A3;}
+.plink{font-size:12px;color:var(--green-deep);text-decoration:underline;flex-shrink:0;}
+.pitem{display:flex;justify-content:space-between;align-items:center;padding:15px 2px;border-bottom:1px solid var(--line);}
+.pitem:last-of-type{border-bottom:none;}
+.pname{font-size:15px;}
+.sw{position:relative;width:47px;height:28px;border-radius:999px;border:none;background:#D8D2C4;cursor:pointer;flex-shrink:0;transition:background .2s;padding:0;}
+.sw i{position:absolute;top:2px;left:2px;width:24px;height:24px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.25);transition:left .2s;}
+.sw.on{background:var(--green);}
+.sw.on i{left:21px;}
+.sw.dis{opacity:.4;}
 .doc{display:flex;gap:10px;padding:10px;border:1px solid var(--line);border-radius:10px;margin-bottom:9px;background:#fff;opacity:0;transition:opacity .4s;}
 .doc.in{opacity:1;}
 .doc.dim{opacity:.4;}
@@ -212,7 +229,7 @@ header{display:flex;align-items:center;justify-content:space-between;padding:4px
 <div class="app">
 
 <header>
-  <div class="brand"><svg class="logo" width="26" height="26" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.4L22.2 10.4V21a1 1 0 0 1-1 1H2.8a1 1 0 0 1-1-1V10.4Z" fill="var(--green)"/><path d="M10.6 9.5h2.8v3.1h3.1v2.8h-3.1v3.1h-2.8v-3.1H7.5v-2.8h3.1Z" fill="#FFFDF8"/></svg><span>FamilyHealth</span></div>
+  <div class="brand"><svg class="logo" role="button" aria-label="integrations" onclick="openPlat()" width="26" height="26" viewBox="0 0 24 24"><path d="M12 2.4L22.2 10.4V21a1 1 0 0 1-1 1H2.8a1 1 0 0 1-1-1V10.4Z" fill="var(--green)"/><path d="M10.6 9.5h2.8v3.1h3.1v2.8h-3.1v3.1h-2.8v-3.1H7.5v-2.8h3.1Z" fill="#FFFDF8"/></svg><span>FamilyHealth</span></div>
   <div class="hr">
     <nav class="tabs">
       <button id="tab-rec" class="on" onclick="switchTab('rec')"><span id="tabRecT">档案</span></button>
@@ -240,7 +257,7 @@ header{display:flex;align-items:center;justify-content:space-between;padding:4px
     <div class="empty" id="bookEmpty"></div>
     <div id="bookMain" class="hidden">
       <section class="status">
-        <span id="phase" class="phase agent"><i class="pulse"></i><span id="phaseT"></span></span>
+        <span id="phase" class="phase agent"><i class="pulse"></i><span id="phaseT"></span></span><span class="chbadge" id="chBadge"></span>
         <h1 id="stateT"></h1>
         <p class="desc" id="stateD"></p>
         <div class="steps" id="steps"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
@@ -331,6 +348,17 @@ header{display:flex;align-items:center;justify-content:space-between;padding:4px
         <button class="btn pa" id="btnSaveRem" onclick="saveRem()" style="margin-top:10px;"></button>
       </div>
     </div>
+  </div>
+</div>
+
+<!-- ============ 平台对接(点徽标) ============ -->
+<div id="platview" class="hidden">
+  <div class="rv-wrap">
+    <div class="rv-bar">
+      <h3 id="platTitle"></h3>
+      <button onclick="closePlat()" aria-label="close">✕</button>
+    </div>
+    <div class="rv-card" id="platList"></div>
   </div>
 </div>
 
@@ -495,6 +523,18 @@ zh:{
   okChat:(d,s,sl)=>`✅ 预约成功:${d} · ${s} · ${sl}。确认邮件稍后送达。还需要约别的吗?`,
   pausedT:'已接管', pausedD:'Agent 已暂停。真实环境下此处可直接操作网页;恢复后 Agent 会重新执行当前步骤',
   resume:'恢复,交还 Agent',
+  chApi:'Zocdoc 官方对接 API', chWeb:'网页自动操作 Web',
+  chApiDesc:'本次通过 Zocdoc 官方 API 对接:速度快,不用操作网页,关键步骤仍由你确认。',
+  chWebDesc:'该渠道暂无官方接口,Agent 将像人手一样操作网页完成预约,全程可见、可接管。',
+  apiSearch:(sp,loc,ins)=>['连接 Zocdoc 官方接口',`查询${sp}医生(${loc} · ${ins})`,'获取实时可约时段','按评分与距离排序,选出候选'],
+  apiForm:slot=>['传输就诊人资料(结构化,不经网页)',`锁定时段 ${slot}`],
+  apiSubmit:['创建预约请求','收到平台确认号'],
+  platTitle:'平台对接', stLive:'官方 API 已对接', stWip:'对接中', stPlan:'规划中', stFb:'网页自动化兜底',
+  stOff:'已断开(将走网页自动化)',
+  tgOnMsg:'已开启 Zocdoc 官方对接', tgOffMsg:'已关闭 Zocdoc 对接,皮肤科将走网页自动化',
+  tgWip:'对接中,暂不可用', tgPlan:'规划中,暂不可用', tgLock:'兜底通道,始终在线',
+  docLink:'API 文档 ↗',
+  platNote:'演示规则:皮肤科走 Zocdoc 官方接口,其他科室走网页自动化,同一个预约流程展示双通道架构。',
   metaIdle:'会话未开始', metaRun:(id,t)=>`会话 #${id} · 已运行 ${t}`, logBtn:'查看操作日志', shots:'每步截图留档',
   lg:{open:'打开 Zocdoc,输入科室与区域', filter:i=>'提交筛选:'+i, exclude:n=>`排除 ${n}(保险不匹配)`,
       sort:'按评分与距离排序,选出候选', wait1:'等待用户确认医生(关卡 1)', picked:(d,s)=>`用户选定 ${d} · ${s}`,
@@ -569,6 +609,18 @@ en:{
   okChat:(d,s,sl)=>`✅ Booked: ${d} · ${s} · ${sl}. Confirmation email on its way. Anything else?`,
   pausedT:'Taken Over', pausedD:'Agent paused. In production you would operate the page directly; on resume the agent redoes the current step.',
   resume:'Resume, hand back to Agent',
+  chApi:'Zocdoc Official API', chWeb:'Web Agent',
+  chApiDesc:'This booking uses the official Zocdoc API: fast, no web driving, and key steps are still confirmed by you.',
+  chWebDesc:'No official API for this channel; the agent drives the website like a human hand, visible and takeover-able throughout.',
+  apiSearch:(sp,loc,ins)=>['Connected to the official Zocdoc API',`Queried ${sp} providers (${loc} · ${ins})`,'Fetched real-time availability','Ranked by rating & distance'],
+  apiForm:slot=>['Sent patient details (structured, no web forms)',`Held slot ${slot}`],
+  apiSubmit:['Created booking request','Received platform confirmation'],
+  platTitle:'Integrations', stLive:'Official API connected', stWip:'In progress', stPlan:'Planned', stFb:'Web-agent fallback',
+  stOff:'Disconnected (falls back to web agent)',
+  tgOnMsg:'Zocdoc official API enabled', tgOffMsg:'Zocdoc API off; dermatology will use the web agent',
+  tgWip:'In progress, not yet available', tgPlan:'Planned, not yet available', tgLock:'Fallback channel, always on',
+  docLink:'API docs ↗',
+  platNote:'Demo rule: dermatology uses the official Zocdoc API; other specialties use the web agent, showing the dual-channel architecture in one flow.',
   metaIdle:'No session yet', metaRun:(id,t)=>`Session #${id} · Running ${t}`, logBtn:'View action log', shots:'Screenshot per step',
   lg:{open:'Opened Zocdoc, entered specialty & area', filter:i=>'Applied filter: '+i, exclude:n=>`Excluded ${n} (insurance mismatch)`,
       sort:'Sorted by rating & distance, picked candidates', wait1:'Waiting for user to confirm doctor (Gate 1)', picked:(d,s)=>`User picked ${d} · ${s}`,
@@ -757,6 +809,17 @@ function renderIntentCard(){
 const B = { state:'idle', timers:[], startTs:null, tick:null, doctor:null, slot:null, log:[] };
 function later(fn,ms){ const t=setTimeout(fn,ms); B.timers.push(t); }
 function clearTimers(){ B.timers.forEach(clearTimeout); B.timers=[]; }
+function chan(){ return (intent.specialty==='derm' && platState.zocdoc!==false) ? 'api' : 'web'; }
+function ledger(rows, done){
+  $('viewport').innerHTML = '<div class="ledger" id="ledgerBox"></div>';
+  rows.forEach((r,i)=> later(()=>{
+    const d = document.createElement('div'); d.className='lrow';
+    d.innerHTML = '<span class="lck">✓</span><span>'+r+'</span>';
+    $('ledgerBox').appendChild(d);
+    logAdd(r);
+  }, 400 + i*550));
+  later(done, 400 + rows.length*550 + 600);
+}
 function logAdd(t){
   const ts = new Date().toLocaleTimeString(LANG==='zh'?'zh-CN':'en-US',{hour12:false});
   B.log.push(ts+' · '+t);
@@ -776,6 +839,14 @@ function setStatus(o){
   const bd = $('badge'); bd.className='badge '+o.phase; bd.textContent = o.badge;
   if(o.url) $('liveUrl').textContent = o.url;
   $('act').innerHTML = o.act || '';
+  const cb = $('chBadge');
+  if(intent.specialty){
+    const c = chan();
+    cb.className = 'chbadge ' + c;
+    cb.textContent = c==='api' ? L().chApi : L().chWeb;
+  }else{
+    cb.className = 'chbadge'; cb.textContent = '';
+  }
 }
 function startTimer(){
   B.startTs = Date.now();
@@ -806,7 +877,7 @@ function stReady(){
   setStatus({phase:'agent', phaseT:l.phIdle, title:l.stReadyT, step:0, badge:l.bdIdle, url:'zocdoc.com',
     desc:`${curName()} · ${spName(intent.specialty)} · ${intent.location} · ${intent.insurance} · ${intent.timePref}`,
     act:`<button class="btn pg" onclick="stSearch()">${l.stReadyBtn}</button><button class="btn ghost" onclick="switchTab('ask')">${l.stReadyBack}</button>`});
-  $('viewport').innerHTML = `<div class="site-h">${l.stReadyVp}</div>`;
+  $('viewport').innerHTML = `<div class="site-h">${l.stReadyVp}</div><p class="rhint" style="padding:2px 4px 0;">${chan()==='api' ? l.chApiDesc : l.chWebDesc}</p>`;
 }
 
 function stSearch(){
@@ -814,6 +885,15 @@ function stSearch(){
   if(!B.startTs) startTimer();
   const l = L();
   const spec = intent.specialty;
+  if(chan()==='api'){
+    const docs = MOCK_DOCS[spec] || MOCK_DOCS.default;
+    setStatus({phase:'agent', phaseT:l.phAgent, title:l.stSearchT, step:1, badge:'API',
+      url:'api.zocdoc.com/v1/providers',
+      desc:l.stSearchD(spName(spec), intent.location, intent.insurance),
+      act:''});
+    ledger(l.apiSearch(spName(spec), intent.location, intent.insurance), ()=>stGate(docs.filter(d=>d.ins)));
+    return;
+  }
   setStatus({phase:'agent', phaseT:l.phAgent, title:l.stSearchT, step:1, badge:l.bdLive,
     url:`zocdoc.com/search?spec=${spec}`,
     desc:l.stSearchD(spName(spec), intent.location, intent.insurance),
@@ -877,6 +957,12 @@ function stForm(){
   B.state='form'; clearTimers();
   const l = L();
   logAdd(l.lg.picked(B.doctor.n, B.slot));
+  if(chan()==='api'){
+    setStatus({phase:'agent', phaseT:l.phAgent, title:l.formT, step:3, badge:'API',
+      url:'api.zocdoc.com/v1/booking', desc:l.formD, act:''});
+    ledger(l.apiForm(B.slot), stSecure);
+    return;
+  }
   setStatus({phase:'agent', phaseT:l.phAgent, title:l.formT, step:3, badge:l.bdLive,
     url:'zocdoc.com/booking/new-patient',
     desc:l.formD,
@@ -962,6 +1048,12 @@ function stGateBack(){
 function stSubmit(){
   B.state='submit'; clearTimers();
   const l = L();
+  if(chan()==='api'){
+    setStatus({phase:'agent', phaseT:l.phAgent, title:l.subT, step:6, badge:'API',
+      url:'api.zocdoc.com/v1/booking/confirm', desc:l.subD, act:''});
+    ledger(l.apiSubmit, ()=>stSuccess());
+    return;
+  }
   setStatus({phase:'agent', phaseT:l.phAgent, title:l.subT, step:6, badge:l.bdLive,
     url:'zocdoc.com/booking/confirm',
     desc:l.subD, act:''});
@@ -1303,6 +1395,54 @@ function openDocView(){
 }
 function closeDocView(){
   $('docview').classList.add('hidden');
+  document.body.style.overflow = '';
+}
+
+/* ================= 平台对接 ================= */
+let platState = store.get('plats') || {zocdoc:true};
+let PLATS = [
+  {id:'zocdoc', n:{zh:'Zocdoc',en:'Zocdoc'}, st:'live', url:'https://api-docs.zocdoc.com'},
+  {id:'epic', n:{zh:'Epic MyChart',en:'Epic MyChart'}, st:'wip', url:'https://fhir.epic.com'},
+  {id:'cerner', n:{zh:'Oracle Health (Cerner)',en:'Oracle Health (Cerner)'}, st:'plan', url:'https://fhir.cerner.com'},
+  {id:'webfb', n:{zh:'其他诊所官网',en:'Other clinic sites'}, st:'fb', url:null}
+];
+fetch('platforms.json?v=' + Date.now())
+  .then(r => r.ok ? r.json() : null)
+  .then(list => {
+    if(Array.isArray(list) && list.length){
+      PLATS = list.map(x => ({id:x.id, n:{zh:x.zh || x.en, en:x.en || x.zh}, st:x.status || 'plan', url:x.url || null}));
+      if(!$('platview').classList.contains('hidden')) renderPlat();
+    }
+  })
+  .catch(()=>{});
+function renderPlat(){
+  const l = L();
+  $('platTitle').textContent = l.platTitle;
+  $('platList').innerHTML = PLATS.map(p=>{
+    const on = p.st==='fb' ? true : (p.st==='live' ? platState[p.id]!==false : false);
+    const dis = p.st!=='live';
+    return `<div class="pitem"><span class="pname">${p.n[LANG]}</span><button class="sw ${on?'on':''} ${dis?'dis':''}" onclick="togglePlat('${p.id}')" aria-label="${p.n[LANG]}"><i></i></button></div>`;
+  }).join('');
+}
+function togglePlat(id){
+  const l = L();
+  const p = PLATS.find(x=>x.id===id);
+  if(!p) return;
+  if(p.st==='wip'){ toast(l.tgWip); return; }
+  if(p.st==='plan'){ toast(l.tgPlan); return; }
+  if(p.st==='fb'){ toast(l.tgLock); return; }
+  platState[id] = platState[id]===false ? true : false;
+  store.set('plats', platState);
+  renderPlat();
+  toast(platState[id]!==false ? l.tgOnMsg : l.tgOffMsg);
+}
+function openPlat(){
+  renderPlat();
+  $('platview').classList.remove('hidden');
+  document.body.style.overflow = 'hidden';
+}
+function closePlat(){
+  $('platview').classList.add('hidden');
   document.body.style.overflow = '';
 }
 
