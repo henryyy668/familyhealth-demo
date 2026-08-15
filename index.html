@@ -6,7 +6,8 @@
 <meta name="theme-color" content="#F4F0E9">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<title>HealthStory</title>
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<title>FamilyHealth</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&display=swap" rel="stylesheet">
 <style>
@@ -25,12 +26,22 @@ body{background:var(--cream);color:var(--ink);font-family:var(--sans);display:fl
 
 header{display:flex;align-items:center;justify-content:space-between;padding:4px 2px 12px;flex-shrink:0;}
 .brand{display:flex;align-items:center;gap:8px;}
-.orbit{width:26px;height:26px;position:relative;}
-.orbit .core{position:absolute;inset:8px;border-radius:50%;background:var(--green);}
-.orbit .ring{position:absolute;inset:0;border:1.5px solid var(--green);border-radius:50%;border-top-color:transparent;transform:rotate(-30deg);}
+.logo{display:block;flex-shrink:0;}
 .brand span{font-family:var(--disp);font-weight:600;font-size:17px;}
+.hr{display:flex;align-items:center;gap:8px;}
+.langbtn{min-width:38px;height:30px;padding:0 8px;border-radius:999px;border:1.5px solid var(--line);background:#fff;font-size:12px;font-family:var(--sans);color:var(--muted);cursor:pointer;}
+.bellbtn{position:relative;min-width:34px;padding:0 7px;font-size:14px;}
+.bdot{position:absolute;top:2px;right:3px;width:8px;height:8px;border-radius:50%;background:var(--amber);border:1.5px solid var(--cream);display:none;}
+.bdot.show{display:block;}
+@media (max-width:409px){.brand span{display:none;}}
+#remview{position:fixed;inset:0;background:var(--cream);z-index:40;overflow-y:auto;-webkit-overflow-scrolling:touch;display:flex;justify-content:center;}
+.rv-wrap{width:100%;max-width:460px;padding:0 12px max(30px, env(safe-area-inset-bottom));}
+.rv-bar{position:sticky;top:0;background:var(--cream);display:flex;justify-content:space-between;align-items:center;padding:16px 2px 10px;z-index:2;}
+.rv-bar h3{font-size:18px;font-weight:600;}
+.rv-bar button{width:32px;height:32px;border-radius:50%;border:1.5px solid var(--line);background:#fff;font-size:14px;cursor:pointer;color:var(--muted);}
+.rv-card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:14px;}
 .tabs{display:flex;background:#EAE4D8;border-radius:999px;padding:3px;}
-.tabs button{position:relative;padding:6px 18px;font-size:13px;border-radius:999px;color:var(--muted);border:none;background:transparent;font-family:var(--sans);cursor:pointer;}
+.tabs button{position:relative;padding:6px 13px;font-size:13px;border-radius:999px;color:var(--muted);border:none;background:transparent;font-family:var(--sans);cursor:pointer;}
 .tabs button.on{background:var(--card);color:var(--ink);font-weight:500;box-shadow:0 1px 2px rgba(0,0,0,.06);}
 .tabs button .dot{position:absolute;top:4px;right:8px;width:7px;height:7px;border-radius:50%;background:var(--amber);display:none;}
 .tabs button .dot.show{display:block;}
@@ -46,6 +57,7 @@ header{display:flex;align-items:center;justify-content:space-between;padding:4px
 .chips{display:flex;flex-wrap:wrap;gap:7px;margin:2px 0 12px;}
 .chips button{padding:8px 14px;font-size:13px;font-family:var(--sans);border:1.5px solid var(--green);color:var(--green-deep);background:#fff;border-radius:999px;cursor:pointer;}
 .chips button:active{background:var(--green-soft);}
+.chips button.sel{background:var(--green);color:#fff;border-color:var(--green);}
 .icard{background:var(--card);border:1.5px solid var(--green);border-radius:var(--r);padding:14px;margin-bottom:12px;max-width:95%;}
 .icard h3{font-size:14px;font-weight:500;margin-bottom:10px;display:flex;align-items:center;gap:7px;}
 .icard h3 i{width:8px;height:8px;border-radius:50%;background:var(--green);}
@@ -53,6 +65,7 @@ header{display:flex;align-items:center;justify-content:space-between;padding:4px
 .irow:last-of-type{border-bottom:none;}
 .irow span:first-child{color:var(--muted);}
 .icard .go{width:100%;margin-top:12px;padding:13px;font-size:15px;font-weight:500;font-family:var(--sans);background:var(--green);color:#fff;border:none;border-radius:11px;cursor:pointer;}
+.icard .save{width:100%;margin-top:8px;padding:12px;font-size:14px;font-family:var(--sans);background:#fff;color:var(--green-deep);border:1.5px solid var(--green);border-radius:11px;cursor:pointer;}
 .inputbar{display:flex;gap:8px;padding:10px 0 max(12px, env(safe-area-inset-bottom));flex-shrink:0;}
 .inputbar input{flex:1;padding:12px 15px;font-size:15px;font-family:var(--sans);border:1.5px solid var(--line);border-radius:999px;background:#fff;outline:none;}
 .inputbar input:focus{border-color:var(--green);}
@@ -145,60 +158,189 @@ header{display:flex;align-items:center;justify-content:space-between;padding:4px
 #logbox{display:none;background:#fff;border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin-top:8px;max-height:160px;overflow-y:auto;}
 #logbox div{font-size:11px;color:var(--muted);padding:3px 0;border-bottom:1px dashed #EFEAE0;font-variant-numeric:tabular-nums;}
 .hidden{display:none !important;}
+
+/* ---------- Records ---------- */
+#recScroll{flex:1;overflow-y:auto;padding-bottom:max(14px, env(safe-area-inset-bottom));-webkit-overflow-scrolling:touch;}
+.rcard{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:14px;margin-bottom:12px;}
+.rcard h3{font-size:14px;font-weight:600;margin-bottom:10px;}
+.rhint{font-size:12px;color:var(--muted);margin-bottom:10px;line-height:1.6;}
+.mbar{display:flex;gap:7px;flex-wrap:wrap;margin:4px 0 12px;}
+.mchip{padding:7px 14px;border-radius:999px;border:1.5px solid var(--line);background:#fff;font-size:13px;font-family:var(--sans);color:var(--muted);cursor:pointer;}
+.mchip.on{background:var(--green);border-color:var(--green);color:#fff;font-weight:500;}
+.mchip.add{border-style:dashed;}
+.mchip .mx{margin-left:4px;opacity:.85;}
+.pgrid{display:grid;grid-template-columns:1fr 1fr;gap:9px;}
+.pf.full{grid-column:1 / -1;}
+.pf label{display:block;font-size:11px;color:var(--muted);margin-bottom:4px;}
+.pf input,.pf select,#docCat{width:100%;padding:9px 11px;font-size:14px;font-family:var(--sans);border:1.5px solid var(--line);border-radius:8px;background:#FCFBF8;outline:none;}
+.pf input:focus{border-color:var(--green);}
+.thumbs{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px;}
+.thumb{position:relative;border:1px solid var(--line);border-radius:10px;overflow:hidden;}
+.thumb img{width:100%;height:88px;object-fit:cover;display:block;}
+.thumb .tcat{position:absolute;left:0;bottom:0;right:0;font-size:10px;padding:3px 6px;background:rgba(34,39,31,.72);color:#fff;}
+.thumb .tdel{position:absolute;top:4px;right:4px;width:22px;height:22px;border-radius:50%;border:none;background:rgba(34,39,31,.72);color:#fff;font-size:12px;line-height:22px;cursor:pointer;}
+.ritem{display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px dashed var(--line);font-size:13px;}
+.ritem .rsub{font-size:11px;color:var(--muted);margin-top:2px;}
+.ritem button{border:none;background:none;color:#A32D2D;font-size:12px;font-family:var(--sans);cursor:pointer;}
+.toast{position:fixed;left:50%;bottom:90px;transform:translateX(-50%);background:var(--ink);color:var(--cream);font-size:13px;padding:10px 18px;border-radius:999px;z-index:99;opacity:0;transition:opacity .3s;pointer-events:none;}
+.toast.show{opacity:1;}
+
+/* ---------- 病历首页(医生视图,永远双语) ---------- */
+#docview{position:fixed;inset:0;background:#fff;z-index:50;overflow-y:auto;-webkit-overflow-scrolling:touch;}
+.dv-bar{position:sticky;top:0;display:flex;justify-content:space-between;background:#fff;border-bottom:1px solid #ddd;padding:10px 14px;z-index:2;}
+.dv-bar button{border:1px solid #ccc;background:#fff;border-radius:8px;padding:8px 14px;font-size:13px;font-family:var(--sans);cursor:pointer;}
+#dv-body{max-width:640px;margin:0 auto;padding:20px 18px 60px;color:#111;}
+#dv-body h2{font-family:var(--disp);font-size:20px;text-align:center;font-weight:600;}
+#dv-body .dv-sub{text-align:center;font-size:11px;color:#666;margin:4px 0 18px;}
+.dv-sec{margin-bottom:16px;}
+.dv-sec h4{font-size:13px;letter-spacing:.06em;border-bottom:1.5px solid #111;padding-bottom:4px;margin-bottom:8px;font-weight:600;}
+.dv-row{display:flex;font-size:13px;padding:4px 0;line-height:1.6;}
+.dv-row b{width:150px;flex-shrink:0;font-weight:500;color:#555;}
+.dv-cat{font-size:12px;color:#555;margin:8px 0 6px;}
+.dv-imgs{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;}
+.dv-imgs figure{margin:0;}
+.dv-imgs figure img{width:100%;border:1px solid #ddd;border-radius:6px;display:block;}
+.dv-imgs figcaption{font-size:11px;color:#666;margin-top:3px;}
+@media print{
+  .app,.toast,.no-print{display:none !important;}
+  #docview{position:static;overflow:visible;}
+  body{background:#fff;display:block;}
+}
 </style>
 </head>
 <body>
 <div class="app">
 
 <header>
-  <div class="brand"><div class="orbit"><div class="ring"></div><div class="core"></div></div><span>HealthStory</span></div>
-  <nav class="tabs">
-    <button id="tab-ask" class="on" onclick="switchTab('ask')">Ask</button>
-    <button id="tab-book" onclick="switchTab('book')">预约<span class="dot" id="bookDot"></span></button>
-  </nav>
+  <div class="brand"><svg class="logo" width="26" height="26" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.4L22.2 10.4V21a1 1 0 0 1-1 1H2.8a1 1 0 0 1-1-1V10.4Z" fill="var(--green)"/><path d="M10.6 9.5h2.8v3.1h3.1v2.8h-3.1v3.1h-2.8v-3.1H7.5v-2.8h3.1Z" fill="#FFFDF8"/></svg><span>FamilyHealth</span></div>
+  <div class="hr">
+    <nav class="tabs">
+      <button id="tab-rec" class="on" onclick="switchTab('rec')"><span id="tabRecT">档案</span></button>
+      <button id="tab-ask" onclick="switchTab('ask')">Ask</button>
+      <button id="tab-book" onclick="switchTab('book')"><span id="tabBookT">预约</span><span class="dot" id="bookDot"></span></button>
+    </nav>
+    <button class="langbtn bellbtn" id="bellBtn" onclick="openRem()" aria-label="reminders">🔔<span class="bdot" id="bellDot"></span></button>
+    <button class="langbtn" id="langBtn" onclick="setLang(LANG==='zh'?'en':'zh')">EN</button>
+  </div>
 </header>
 
 <!-- ============ ASK ============ -->
-<div class="page on" id="page-ask">
+<div class="page" id="page-ask">
+  <div class="mbar" id="memberBarAsk" style="margin:2px 0 8px;flex-shrink:0;"></div>
   <div id="chat"></div>
   <div class="inputbar">
-    <input id="askInput" type="text" placeholder="描述症状,或直接说想约的科室" autocomplete="off">
-    <button onclick="userSend()" aria-label="发送">↑</button>
+    <input id="askInput" type="text" placeholder="" autocomplete="off">
+    <button onclick="userSend()" aria-label="send">↑</button>
   </div>
 </div>
 
 <!-- ============ BOOKING ============ -->
 <div class="page" id="page-book">
   <div id="bookScroll">
-    <div class="empty" id="bookEmpty">
-      还没有预约意图。<br>先去 Ask 说说你的需求,我来整理成预约条件。
-      <br><button onclick="switchTab('ask')">去 Ask</button>
-    </div>
+    <div class="empty" id="bookEmpty"></div>
     <div id="bookMain" class="hidden">
       <section class="status">
-        <span id="phase" class="phase agent"><i class="pulse"></i><span id="phaseT">AGENT 正在操作</span></span>
-        <h1 id="stateT">意图就绪</h1>
+        <span id="phase" class="phase agent"><i class="pulse"></i><span id="phaseT"></span></span>
+        <h1 id="stateT"></h1>
         <p class="desc" id="stateD"></p>
         <div class="steps" id="steps"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
-        <div class="step-names"><span>意图</span><span>搜索</span><span>确认</span><span>填表</span><span>敏感</span><span>审查</span><span>提交</span></div>
+        <div class="step-names" id="stepNames"></div>
       </section>
       <section class="live" id="live">
         <div class="chrome">
           <span class="url" id="liveUrl">zocdoc.com</span>
-          <span class="badge agent" id="badge">待命</span>
+          <span class="badge agent" id="badge"></span>
         </div>
         <div class="viewport" id="viewport"></div>
       </section>
       <section class="actions" id="act"></section>
       <div class="meta">
-        <span id="metaL">会话未开始</span>
-        <button onclick="toggleLog()">查看操作日志</button>
+        <span id="metaL"></span>
+        <button onclick="toggleLog()" id="logBtnT"></button>
       </div>
       <div id="logbox"></div>
     </div>
   </div>
 </div>
 
+<!-- ============ RECORDS ============ -->
+<div class="page on" id="page-rec">
+  <div id="recScroll">
+    <div class="mbar" id="memberBar"></div>
+    <button class="btn pg" id="btnGen" onclick="openDocView()" style="margin:4px 0 14px;"></button>
+
+    <div class="rcard">
+      <h3 id="h3Basic"></h3>
+      <div class="pgrid">
+        <div class="pf"><label id="lbName"></label><input id="pf-name"></div>
+        <div class="pf"><label id="lbBirth"></label><input id="pf-birth" inputmode="numeric" placeholder="1990"></div>
+        <div class="pf"><label id="lbSex"></label><select id="pf-sex"><option value=""></option><option value="M"></option><option value="F"></option></select></div>
+        <div class="pf"><label id="lbBlood"></label><input id="pf-blood" placeholder="O+"></div>
+        <div class="pf"><label id="lbMarital"></label><select id="pf-marital"><option value=""></option><option value="single"></option><option value="married"></option><option value="divorced"></option><option value="widowed"></option></select></div>
+        <div class="pf full"><label id="lbAddr"></label><input id="pf-addr"></div>
+        <div class="pf full"><label id="lbAllergy"></label><input id="pf-allergy"></div>
+        <div class="pf full"><label id="lbMeds"></label><input id="pf-meds"></div>
+        <div class="pf full"><label id="lbChronic"></label><input id="pf-chronic"></div>
+        <div class="pf full"><label id="lbFamily"></label><input id="pf-family"></div>
+      </div>
+      <button class="btn ghost" id="btnSaveProf" onclick="saveProfile()" style="margin-top:10px;"></button>
+    </div>
+
+    <div class="rcard">
+      <h3 id="h3Photo"></h3>
+      <p class="rhint" id="photoHint"></p>
+      <select id="docCat"></select>
+      <button class="btn pg" id="btnPhoto" onclick="document.getElementById('photoIn').click()" style="margin-top:8px;"></button>
+      <input type="file" id="photoIn" accept="image/*" multiple hidden>
+      <div class="thumbs" id="thumbs"></div>
+    </div>
+
+    <div class="rcard">
+      <h3 id="h3Hist"></h3>
+      <div id="recList"></div>
+    </div>
+  </div>
+</div>
+
+</div>
+
+<!-- ============ 提醒(铃铛面板) ============ -->
+<div id="remview" class="hidden">
+  <div class="rv-wrap">
+    <div class="rv-bar">
+      <h3 id="h3Rem"></h3>
+      <button onclick="closeRem()" aria-label="close">✕</button>
+    </div>
+    <div class="rv-card">
+      <p class="rhint" id="remHint"></p>
+      <div class="mbar" id="memberBarRem"></div>
+      <div id="remList"></div>
+      <button class="btn ghost" id="btnAddRem" onclick="openRemForm()" style="margin-top:8px;"></button>
+      <button class="btn ghost" id="btnNotif" onclick="askNotif()" style="margin-top:8px;"></button>
+      <div id="remForm" class="hidden" style="margin-top:12px;">
+        <div class="pgrid">
+          <div class="pf"><label id="lbRType"></label><select id="rm-type" onchange="onRemType()"><option value="med"></option><option value="check"></option><option value="appt"></option></select></div>
+          <div class="pf"><label id="lbRTitle"></label><input id="rm-title"></div>
+          <div class="pf full" id="rowWhen"><label id="lbRWhen"></label><input id="rm-when" type="datetime-local"></div>
+          <div class="pf full" id="rowMed">
+            <label id="lbRTimes"></label>
+            <div class="chips" id="medTimes" style="margin:6px 0 10px;"></div>
+            <label id="lbRDays"></label><input id="rm-days" inputmode="numeric" placeholder="7">
+          </div>
+        </div>
+        <button class="btn pa" id="btnSaveRem" onclick="saveRem()" style="margin-top:10px;"></button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ 病历首页(医生视图) ============ -->
+<div id="docview" class="hidden">
+  <div class="dv-bar no-print">
+    <button onclick="closeDocView()">← 返回 Back</button>
+    <button onclick="window.print()">打印 / PDF Print</button>
+  </div>
+  <div id="dv-body"></div>
 </div>
 
 <script>
@@ -208,9 +350,9 @@ header{display:flex;align-items:center;justify-content:space-between;padding:4px
 const BACKEND = {
   mode: 'mock',
   endpoints: {
-    intent:  '/api/intent',            // Ask 意图解析(接 LLM)
-    session: '/api/booking/session',   // 创建预约会话(Browserbase)
-    liveView:''                        // live view iframe 地址
+    intent:  '/api/intent',
+    session: '/api/booking/session',
+    liveView:''
   }
 };
 
@@ -218,36 +360,278 @@ const store = {
   get(k){ try{ return JSON.parse(localStorage.getItem('hs_'+k)); }catch(e){ return null; } },
   set(k,v){ try{ localStorage.setItem('hs_'+k, JSON.stringify(v)); }catch(e){} }
 };
+const $ = id=>document.getElementById(id);
+
+/* ================= 家庭成员 ================= */
+if(!store.get('migrated_members')){
+  ['profile','docs','asks','rems','bookings'].forEach(k=>{
+    const v = store.get(k);
+    if(v && !store.get(k+'_self')) store.set(k+'_self', v);
+  });
+  store.set('migrated_members', 1);
+}
+let members = store.get('members') || [{id:'self'}];
+if(!store.get('members')) store.set('members', members);
+let curM = store.get('curM') || 'self';
+if(!members.find(m=>m.id===curM)) curM = 'self';
+function mget(k){ return store.get(k+'_'+curM); }
+function mset(k,v){ store.set(k+'_'+curM, v); }
+function mName(m){ return m.id==='self' ? L().selfName : m.name; }
+function curName(){ const m = members.find(x=>x.id===curM); return m ? mName(m) : L().selfName; }
+function memberChipsHtml(){
+  return members.map(m=>{
+    const on = m.id===curM;
+    const x = (on && m.id!=='self') ? ` <span class="mx" onclick="event.stopPropagation();delMember('${m.id}')">✕</span>` : '';
+    return `<button class="mchip ${on?'on':''}" onclick="switchMember('${m.id}')">${mName(m)}${x}</button>`;
+  }).join('') + `<button class="mchip add" onclick="addMember()">${L().addMember}</button>`;
+}
+function renderMembers(){
+  ['memberBar','memberBarRem','memberBarAsk'].forEach(id=>{
+    const el = $(id); if(el) el.innerHTML = memberChipsHtml();
+  });
+}
+function reloadMemberData(){
+  profile = mget('profile') || {};
+  docs = mget('docs') || [];
+  asks = mget('asks') || [];
+  rems = mget('rems') || [];
+}
+function switchMember(id){
+  if(id===curM) return;
+  curM = id; store.set('curM', curM);
+  reloadMemberData();
+  renderMembers(); renderRecords(); renderRems(); updateBell();
+}
+function addMember(){
+  const n = prompt(L().promptName);
+  if(!n || !n.trim()) return;
+  const m = {id:'m'+Date.now(), name:n.trim().slice(0,12)};
+  members.push(m); store.set('members', members);
+  switchMember(m.id);
+}
+function delMember(id){
+  const m = members.find(x=>x.id===id);
+  if(!m || id==='self') return;
+  if(!confirm(L().delMemberAsk(mName(m)))) return;
+  members = members.filter(x=>x.id!==id);
+  store.set('members', members);
+  ['profile','docs','asks','rems','bookings'].forEach(k=>{
+    try{ localStorage.removeItem('hs_'+k+'_'+id); }catch(e){}
+  });
+  switchMember('self');
+}
+
+/* ================= 语言 ================= */
+let LANG = store.get('lang') || 'zh';
+
+const SPEC = {
+  derm:{zh:'皮肤科',en:'Dermatology',kw:['皮肤','痘','疹','痒','斑','湿疹','痣','skin','rash','acne','itch','eczema','mole','derm']},
+  dent:{zh:'牙科',en:'Dental',kw:['牙','口腔','智齿','洗牙','tooth','teeth','dental','wisdom','cavity','gum']},
+  eye:{zh:'眼科',en:'Eye Care',kw:['眼','视力','近视','干眼','eye','vision','sight','blurry']},
+  fert:{zh:'生殖医学',en:'Fertility / IVF',kw:['生育','ivf','备孕','试管','不孕','fertility','pregnan','conceive']},
+  ortho:{zh:'骨科',en:'Orthopedics',kw:['骨','关节','腰','膝','扭伤','颈椎','bone','joint','knee','back','sprain','neck','shoulder','ortho']},
+  gp:{zh:'全科',en:'Primary Care',kw:['感冒','发烧','体检','头疼','咳嗽','全科','cold','fever','checkup','headache','cough','flu','physical']}
+};
+function spName(k){ const s=SPEC[k]; return s ? s[LANG] : k; }
+function spBi(k){ const s=SPEC[k]; return s ? s.zh+' '+s.en : k; }
+
+const CATS = {
+  report:{zh:'检查报告',en:'Report'}, rx:{zh:'处方 / 用药',en:'Prescription'},
+  insc:{zh:'保险卡',en:'Insurance Card'}, dis:{zh:'出院小结',en:'Discharge Summary'},
+  vax:{zh:'疫苗记录',en:'Vaccination'}, other:{zh:'其他',en:'Other'}
+};
+function catName(k){ const c=CATS[k]; return c ? c[LANG] : k; }
+function catBi(k){ const c=CATS[k]; return c ? c.zh+' '+c.en : k; }
+const SEXL = {M:{zh:'男',en:'Male'},F:{zh:'女',en:'Female'}};
+const MARL = {single:{zh:'未婚',en:'Single'},married:{zh:'已婚',en:'Married'},divorced:{zh:'离异',en:'Divorced'},widowed:{zh:'丧偶',en:'Widowed'}};
+function bi(map,v){ if(!v) return null; const e=map[v]; return e ? e.zh+' '+e.en : v; }
+
+const T = {
+zh:{
+  tabBook:'预约', tabRec:'档案', langBtn:'EN',
+  ph:'描述症状,或直接说想约的科室',
+  greet:'你好,我是 FamilyHealth。先说说哪里不舒服、持续多久了,我来判断该看什么科,再帮你约。问诊可保存到档案,看医生前能一键生成病历首页。',
+  probe1:'能再具体一点吗?比如不舒服在哪个部位、持续多久、有没有别的伴随症状。',
+  probeFallback:'或者直接选一个科室:',
+  recSpec:s=>`听下来我建议看${s}。要按这个约吗?`,
+  confirmYes:'对,就约这个', confirmNo:'不对,重新描述',
+  reAsk:'好,那再描述一下你的情况:',
+  noMatch:'我还没对上科室,选一个,或再描述一下症状:',
+  gotSpec:s=>`明白,帮你约${s}。多急?`,
+  urg:['尽快(3 天内)','一周内','两周内','不急'],
+  locQ:'去哪个区域看?输入 ZIP 或城市名。', lastPrefix:'用上次的:',
+  insQ:'用哪个保险?', selfPay:'自费',
+  timeQ:'时间偏好?', time:['工作日上午','工作日下午','周末','都行'],
+  cardReady:'确认无误就点"去预约"。也可以先保存问诊记录,再去"档案"页拍照存报告和处方,看医生前一键生成病历首页。',
+  doneHint:'意图卡片已生成,可以去预约了。想改条件就说"重新开始"。',
+  restart:'重新开始', restartMsg:'好,重新来。哪里不舒服,或想约什么科?',
+  icTitle:'预约意图已就绪', icWho:'就诊人', icSpec:'科室', icReason:'原因', icUrg:'紧急度', icLoc:'区域', icIns:'保险', icTime:'时间',
+  icGo:'去预约 · Agent 接手', icSave:'保存问诊记录到档案',
+  savedAsk:'问诊记录已存入档案', savedProf:'基本信息已保存', savedPhoto:(n,c)=>`已保存 ${n} 张到"${c}"`,
+  quotaErr:'本机存储空间不够,这批照片没存下。删除几张旧资料再试。',
+  bkEmpty:'还没有预约意图。<br>先去 Ask 说说你的需求,我来整理成预约条件。', bkGoAsk:'去 Ask',
+  stepNames:['意图','搜索','确认','填表','敏感','审查','提交'],
+  phAgent:'AGENT 正在操作', phWaitU:'等待你确认', phYou:'你正在操作', phIdle:'待命', phDone:'完成',
+  bdLive:'LIVE', bdPaused:'已暂停', bdTake:'接管中', bdIdle:'待命', bdDone:'完成',
+  stReadyT:'意图就绪', stReadyBtn:'开始自动预约', stReadyBack:'回 Ask 改条件', stReadyVp:'Agent 待命中,点击下方开始',
+  stSearchT:'搜索医生', stSearchD:(a,b,c)=>`按你的条件筛选:${a} · ${b} 附近 · ${c}`,
+  pauseBtn:'暂停,我来接管', loading:'正在加载搜索结果…', results:s=>`搜索结果 · ${s}`, noIns:i=>' · 不收 '+i,
+  gateT:'确认医生', gateD:'关卡 1 · 你选定医生和时段后,Agent 才继续填表',
+  gateH:n=>`Agent 找到 ${n} 位符合条件的医生,请选定医生和时段`, gateBest:'最匹配', takesIns:i=>'收 '+i,
+  gateGo:'选定,继续预约', gateNo:'都不合适,重新搜索',
+  formT:'填写表单', formD:'Agent 填写非敏感字段,敏感信息稍后由你亲手输入',
+  fDoc:'预约医生', fReason:'就诊原因', fType:'患者类型', fNew:'新患者', fTime:'时间偏好',
+  secT:'敏感输入', secD:'登录与保险信息由你亲手输入,Agent 已回避此页面',
+  secH:'登录 Zocdoc 并补全保险信息', secMail:'邮箱', secPw:'密码', secIns:i=>`保险会员号(${i})`,
+  secShield:'控制权在你手上。此页面的键盘输入不经过 Agent。当前为演示环境,这些内容不会上传或保存。',
+  secDone:'输入完成,交还 Agent', errMail:'请填写邮箱', errPw:'请填写密码', errIns:'请填写会员号',
+  revT:'最终审查', revD:'关卡 2 · 这是提交前的最后一步,请核对全部信息', revH:'预约信息核对',
+  rDoc:'医生', rSlot:'时段', rSpec:'科室', rReason:'就诊原因', rLoc:'区域', rIns:'保险', rType:'患者类型',
+  revGo:'确认无误,提交预约', revBack:'返回修改医生或时段',
+  subT:'提交预约', subD:'Agent 点击最终提交,等待网站确认', subVp:'提交中…',
+  okT:'预约成功', okD:'确认邮件会发到你填写的邮箱', okH:n=>`已约上 ${n}`,
+  okStats:(dur)=>`全程 ${dur},共 2 次人工确认`,
+  okBack:'回到 Ask', okAgain:'再约一个',
+  okChat:(d,s,sl)=>`✅ 预约成功:${d} · ${s} · ${sl}。确认邮件稍后送达。还需要约别的吗?`,
+  pausedT:'已接管', pausedD:'Agent 已暂停。真实环境下此处可直接操作网页;恢复后 Agent 会重新执行当前步骤',
+  resume:'恢复,交还 Agent',
+  metaIdle:'会话未开始', metaRun:(id,t)=>`会话 #${id} · 已运行 ${t}`, logBtn:'查看操作日志', shots:'每步截图留档',
+  lg:{open:'打开 Zocdoc,输入科室与区域', filter:i=>'提交筛选:'+i, exclude:n=>`排除 ${n}(保险不匹配)`,
+      sort:'按评分与距离排序,选出候选', wait1:'等待用户确认医生(关卡 1)', picked:(d,s)=>`用户选定 ${d} · ${s}`,
+      fill:f=>'填写:'+f, sec:'进入敏感输入,Agent 回避', secDone:'用户完成敏感输入,交还 Agent',
+      wait2:'等待用户最终确认(关卡 2)', click:'点击提交按钮', got:'收到网站确认页', end:'预约成功,会话结束', pause:'用户暂停并接管'},
+  h3Rem:'提醒', remHint:'就诊、检查、吃药都能设提醒。最可靠的是"加入日历",手机系统会准时响铃;页面通知只在 App 打开时生效。',
+  btnAddRem:'+ 添加提醒', btnNotif:'开启页面通知', notifOn:'通知已开启(App 打开时生效)', notifNo:'此设备不支持页面通知,用"加入日历"最可靠',
+  lbRType:'类型', lbRTitle:'名称', lbRWhen:'时间', lbRTimes:'每天服药时间', lbRDays:'持续天数',
+  rType:{med:'吃药',check:'检查',appt:'就诊/复诊'}, phRTitle:'如:阿莫西林 / 血常规复查',
+  btnSaveRem:'保存提醒', remSaved:'提醒已保存', addCal:'加入日历', nextAt:'下次:', noTime:'未设时间,点右侧设置', past:'已完成 / 已过期',
+  remEmpty:'预约成功会自动生成就诊提醒;拍处方照片会提示设置吃药提醒',
+  rxAsk:'检测到处方照片,现在设置吃药提醒吗?',
+  apptRem:(d,s)=>`就诊:${d} · ${s}`, dueNow:t=>`提醒:${t}`,
+  addMember:'+ 添加成员', selfName:'我', promptName:'成员名字(如:妈妈、爸爸、女儿)',
+  delMemberAsk:n=>`删除"${n}"及其全部档案和提醒?`,
+  recGen:'生成病历首页 · 给医生看', basic:'基本信息',
+  lbName:'姓名', lbBirth:'出生年份', lbSex:'性别', lbBlood:'血型', lbMarital:'婚姻状况', lbAddr:'地址',
+  lbAllergy:'过敏史', lbMeds:'长期用药', lbChronic:'慢性病史', lbFamily:'家族史',
+  phName:'就诊人姓名', phAddr:'常住地址', phAllergy:'药物或食物过敏,无则填 无', phMeds:'正在长期服用的药物',
+  phChronic:'高血压、糖尿病等', phFamily:'直系亲属重大疾病史,无则填 无',
+  optNA:'未填写', saveProf:'保存基本信息',
+  photoH:'拍照存资料', photoHint:'检查报告、处方、保险卡、出院小结,拍下来集中放这里,生成病历首页时会自动附上。资料只存在这台手机里,不会上传。',
+  photoBtn:'拍照或从相册选择', thumbsEmpty:'还没有资料,拍第一张试试',
+  histH:'问诊与预约记录', histEmpty:'保存的问诊和完成的预约会出现在这里',
+  histAsk:'问诊', histBook:'预约', del:'删除'
+},
+en:{
+  tabBook:'Book', tabRec:'Files', langBtn:'中',
+  ph:'Describe symptoms, or name a specialty',
+  greet:"Hi, I'm FamilyHealth. Tell me what's bothering you and for how long. I'll work out the right specialty, then book it for you. Consults can be saved to Files, and you can generate a patient summary before any visit.",
+  probe1:'Could you be more specific? Where is it, how long has it lasted, any other symptoms?',
+  probeFallback:'Or pick a specialty directly:',
+  recSpec:s=>`Based on what you said, I'd recommend ${s}. Book this?`,
+  confirmYes:'Yes, book this', confirmNo:'No, let me re-describe',
+  reAsk:"OK, tell me more about what you're feeling:",
+  noMatch:"I couldn't match a specialty. Pick one, or describe your symptoms again:",
+  gotSpec:s=>`Got it, booking ${s}. How urgent?`,
+  urg:['ASAP (3 days)','Within a week','Within 2 weeks','Flexible'],
+  locQ:'Which area? Enter a ZIP or city.', lastPrefix:'Use last: ',
+  insQ:'Which insurance?', selfPay:'Self-pay',
+  timeQ:'Time preference?', time:['Weekday AM','Weekday PM','Weekend','Any time'],
+  cardReady:'Tap "Book with Agent" if this looks right. You can also save this consult, then add photos of reports in Files and generate a patient summary before your visit.',
+  doneHint:'Your intent card is ready. Say "start over" to change anything.',
+  restart:'Start over', restartMsg:"OK, from the top. What's bothering you, or which specialty?",
+  icTitle:'Booking intent ready', icWho:'For', icSpec:'Specialty', icReason:'Reason', icUrg:'Urgency', icLoc:'Area', icIns:'Insurance', icTime:'Time',
+  icGo:'Book with Agent', icSave:'Save consult to Files',
+  savedAsk:'Consult saved to Files', savedProf:'Basic info saved', savedPhoto:(n,c)=>`Saved ${n} photo(s) to "${c}"`,
+  quotaErr:'Not enough storage on this device. Delete a few old photos and try again.',
+  bkEmpty:'No booking intent yet.<br>Tell Ask what you need first.', bkGoAsk:'Go to Ask',
+  stepNames:['Intent','Search','Confirm','Form','Secure','Review','Submit'],
+  phAgent:'AGENT WORKING', phWaitU:'AWAITING YOUR CONFIRMATION', phYou:"YOU'RE IN CONTROL", phIdle:'STANDBY', phDone:'DONE',
+  bdLive:'LIVE', bdPaused:'PAUSED', bdTake:'TAKEOVER', bdIdle:'IDLE', bdDone:'DONE',
+  stReadyT:'Intent Ready', stReadyBtn:'Start Auto-Booking', stReadyBack:'Back to Ask', stReadyVp:'Agent on standby. Tap below to start.',
+  stSearchT:'Searching Doctors', stSearchD:(a,b,c)=>`Filtering by your criteria: ${a} · near ${b} · ${c}`,
+  pauseBtn:'Pause, I\'ll take over', loading:'Loading results…', results:s=>`Results · ${s}`, noIns:i=>' · No '+i,
+  gateT:'Confirm Doctor', gateD:'Gate 1 · The agent continues only after you pick a doctor and slot',
+  gateH:n=>`Agent found ${n} matching doctors. Pick a doctor and time slot.`, gateBest:'Best match', takesIns:i=>'Takes '+i,
+  gateGo:'Confirm & continue', gateNo:'None fit, search again',
+  formT:'Filling Form', formD:'Agent fills non-sensitive fields; you enter sensitive info yourself later',
+  fDoc:'Doctor', fReason:'Reason for visit', fType:'Patient type', fNew:'New patient', fTime:'Time preference',
+  secT:'Secure Input', secD:'You enter login and insurance yourself; the agent has stepped away from this page',
+  secH:'Sign in to Zocdoc & add insurance', secMail:'Email', secPw:'Password', secIns:i=>`Insurance member ID (${i})`,
+  secShield:'You are in control. Keystrokes on this page never reach the agent. This is a demo; nothing is uploaded or saved.',
+  secDone:'Done, hand back to Agent', errMail:'Email required', errPw:'Password required', errIns:'Member ID required',
+  revT:'Final Review', revD:'Gate 2 · Last step before submission. Check everything.', revH:'Review booking details',
+  rDoc:'Doctor', rSlot:'Slot', rSpec:'Specialty', rReason:'Reason', rLoc:'Area', rIns:'Insurance', rType:'Patient type',
+  revGo:'Looks right, submit booking', revBack:'Change doctor or slot',
+  subT:'Submitting', subD:'Agent clicks final submit, waiting for site confirmation', subVp:'Submitting…',
+  okT:'Booked!', okD:'A confirmation email is on its way', okH:n=>`Booked with ${n}`,
+  okStats:(dur)=>`Total ${dur} · 2 human confirmations`,
+  okBack:'Back to Ask', okAgain:'Book another',
+  okChat:(d,s,sl)=>`✅ Booked: ${d} · ${s} · ${sl}. Confirmation email on its way. Anything else?`,
+  pausedT:'Taken Over', pausedD:'Agent paused. In production you would operate the page directly; on resume the agent redoes the current step.',
+  resume:'Resume, hand back to Agent',
+  metaIdle:'No session yet', metaRun:(id,t)=>`Session #${id} · Running ${t}`, logBtn:'View action log', shots:'Screenshot per step',
+  lg:{open:'Opened Zocdoc, entered specialty & area', filter:i=>'Applied filter: '+i, exclude:n=>`Excluded ${n} (insurance mismatch)`,
+      sort:'Sorted by rating & distance, picked candidates', wait1:'Waiting for user to confirm doctor (Gate 1)', picked:(d,s)=>`User picked ${d} · ${s}`,
+      fill:f=>'Filled: '+f, sec:'Secure input, agent stepped away', secDone:'User finished secure input, handed back',
+      wait2:'Waiting for final confirmation (Gate 2)', click:'Clicked submit', got:'Got confirmation page', end:'Booked, session ended', pause:'User paused & took over'},
+  h3Rem:'Reminders', remHint:'Set reminders for visits, tests and medications. "Add to Calendar" is the most reliable — your phone alerts on time; page notifications only work while the app is open.',
+  btnAddRem:'+ Add reminder', btnNotif:'Enable page notifications', notifOn:'Notifications on (while app is open)', notifNo:'Page notifications unsupported here; use "Add to Calendar"',
+  lbRType:'Type', lbRTitle:'Title', lbRWhen:'When', lbRTimes:'Daily med times', lbRDays:'Days',
+  rType:{med:'Medication',check:'Test / Checkup',appt:'Visit / Follow-up'}, phRTitle:'e.g. Amoxicillin / Blood test',
+  btnSaveRem:'Save reminder', remSaved:'Reminder saved', addCal:'Add to Calendar', nextAt:'Next: ', noTime:'No time set — pick one', past:'Done / past',
+  remEmpty:'Bookings auto-create a visit reminder; prescription photos prompt a medication reminder',
+  rxAsk:'Prescription photo detected. Set a medication reminder now?',
+  apptRem:(d,s)=>`Visit: ${d} · ${s}`, dueNow:t=>`Reminder: ${t}`,
+  addMember:'+ Add member', selfName:'Me', promptName:'Member name (e.g. Mom, Dad, Daughter)',
+  delMemberAsk:n=>`Delete "${n}" and all their records & reminders?`,
+  recGen:'Generate Patient Summary', basic:'Basic Info',
+  lbName:'Name', lbBirth:'Birth Year', lbSex:'Sex', lbBlood:'Blood Type', lbMarital:'Marital Status', lbAddr:'Address',
+  lbAllergy:'Allergies', lbMeds:'Medications', lbChronic:'Chronic Conditions', lbFamily:'Family History',
+  phName:'Patient name', phAddr:'Home address', phAllergy:'Drug or food allergies, or None', phMeds:'Current long-term medications',
+  phChronic:'Hypertension, diabetes, etc.', phFamily:'Major illnesses in immediate family, or None',
+  optNA:'N/A', saveProf:'Save Basic Info',
+  photoH:'Photo Records', photoHint:'Snap reports, prescriptions, insurance cards and discharge summaries here; they attach to the patient summary automatically. Photos stay on this phone only.',
+  photoBtn:'Take Photo / Choose', thumbsEmpty:'No records yet. Snap the first one.',
+  histH:'Consults & Bookings', histEmpty:'Saved consults and completed bookings show up here',
+  histAsk:'Consult', histBook:'Booking', del:'Delete'
+}
+};
+function L(){ return T[LANG]; }
 
 /* ================= Mock 数据 ================= */
-const SPECIALTIES = {
-  '皮肤科':{en:'dermatology', kw:['皮肤','痘','疹','痒','斑','湿疹','痣']},
-  '牙科':{en:'dentistry', kw:['牙','口腔','智齿','洗牙']},
-  '眼科':{en:'ophthalmology', kw:['眼','视力','近视','干眼']},
-  '生殖医学':{en:'fertility / IVF', kw:['生育','ivf','备孕','试管','不孕']},
-  '骨科':{en:'orthopedics', kw:['骨','关节','腰','膝','扭伤','颈椎']},
-  '全科':{en:'primary care', kw:['感冒','发烧','体检','头疼','咳嗽','全科']}
-};
 const MOCK_DOCS = {
-  '皮肤科':[
-    {n:'Dr. Sarah Chen', r:4.9, d:'2.1 mi', ins:true,  slots:['周三 10:30','周三 2:00','周五 11:15'], best:'收你的保险,距离最近,评分最高'},
-    {n:'Dr. Michael Torres', r:4.8, d:'3.4 mi', ins:true,  slots:['周四 3:15','周五 9:00'], best:'收你的保险,最早周四有号'},
-    {n:'Dr. Emily Park', r:4.6, d:'8.9 mi', ins:false, slots:[], best:''}
+  derm:[
+    {n:'Dr. Sarah Chen', r:4.9, d:'2.1 mi', ins:true,
+     slots:{zh:['周三 10:30','周三 2:00','周五 11:15'],en:['Wed 10:30','Wed 2:00','Fri 11:15']},
+     best:{zh:'收你的保险,距离最近,评分最高',en:'takes your insurance, closest, top rated'}},
+    {n:'Dr. Michael Torres', r:4.8, d:'3.4 mi', ins:true,
+     slots:{zh:['周四 3:15','周五 9:00'],en:['Thu 3:15','Fri 9:00']},
+     best:{zh:'收你的保险,最早周四有号',en:'takes your insurance, earliest Thursday'}},
+    {n:'Dr. Emily Park', r:4.6, d:'8.9 mi', ins:false, slots:{zh:[],en:[]}, best:{zh:'',en:''}}
   ],
   default:[
-    {n:'Dr. James Wu', r:4.9, d:'1.8 mi', ins:true, slots:['周二 2:00','周三 10:00','周四 4:30'], best:'收你的保险,距离最近,评分最高'},
-    {n:'Dr. Ana Rivera', r:4.7, d:'4.2 mi', ins:true, slots:['周三 3:30','周五 10:15'], best:'收你的保险,时段选择多'},
-    {n:'Dr. David Kim', r:4.5, d:'7.6 mi', ins:false, slots:[], best:''}
+    {n:'Dr. James Wu', r:4.9, d:'1.8 mi', ins:true,
+     slots:{zh:['周二 2:00','周三 10:00','周四 4:30'],en:['Tue 2:00','Wed 10:00','Thu 4:30']},
+     best:{zh:'收你的保险,距离最近,评分最高',en:'takes your insurance, closest, top rated'}},
+    {n:'Dr. Ana Rivera', r:4.7, d:'4.2 mi', ins:true,
+     slots:{zh:['周三 3:30','周五 10:15'],en:['Wed 3:30','Fri 10:15']},
+     best:{zh:'收你的保险,时段选择多',en:'takes your insurance, most slot options'}},
+    {n:'Dr. David Kim', r:4.5, d:'7.6 mi', ins:false, slots:{zh:[],en:[]}, best:{zh:'',en:''}}
   ]
 };
 
 /* ================= Ask 对话引擎 ================= */
 let intent = { specialty:null, reason:null, urgency:null, location:null, insurance:null, timePref:null };
 let askStep = 'start';
-const chat = document.getElementById('chat');
-const askInput = document.getElementById('askInput');
+let userSpoke = false;
+let symptomBuf = '';
+let missCount = 0;
+let pendingSpec = null;
+const chat = $('chat');
+const askInput = $('askInput');
 askInput.addEventListener('keydown', e=>{ if(e.key==='Enter') userSend(); });
 
+function specChips(){ return Object.keys(SPEC).map(k=>spName(k)); }
 function pushBot(text, chips){
   const m = document.createElement('div'); m.className='msg bot'; m.textContent=text; chat.appendChild(m);
   if(chips && chips.length){
@@ -266,85 +650,118 @@ function userSend(){
   askInput.value=''; handleUser(v,false);
 }
 function matchSpecialty(t){
-  const low = t.toLowerCase();
-  for(const [name,cfg] of Object.entries(SPECIALTIES)){
-    if(t.includes(name.replace('科',''))||low.includes(cfg.en.split(' ')[0])) return name;
-    if(cfg.kw.some(k=>low.includes(k))) return name;
+  const low = t.toLowerCase().trim();
+  for(const [k,c] of Object.entries(SPEC)){
+    if(t.trim()===c.zh || low===c.en.toLowerCase()) return k;
+    if(c.zh.length>1 && t.includes(c.zh.replace('科',''))) return k;
+    if(c.kw.some(w=>low.includes(w))) return k;
   }
   return null;
 }
+function isRestart(t){
+  return t===T.zh.restart || t===T.en.restart || t.includes('重新') || /start over/i.test(t);
+}
 function handleUser(text, isChip){
+  userSpoke = true;
   pushUser(text);
   setTimeout(()=>askFlow(text,isChip), 350);
 }
+function isYesTxt(t){
+  return t===T.zh.confirmYes || t===T.en.confirmYes || /^(对|是|好|嗯|行|yes|yeah|ok|sure)/i.test(t.trim());
+}
+function isNoTxt(t){
+  return t===T.zh.confirmNo || t===T.en.confirmNo || /^(不|别|no|nah)/i.test(t.trim());
+}
 function askFlow(text, isChip){
+  const l = L();
   if(askStep==='start'){
-    const sp = matchSpecialty(text) || (SPECIALTIES[text] ? text : null);
-    if(sp){
+    symptomBuf = (symptomBuf + ' ' + text).trim();
+    const sp = matchSpecialty(text) || matchSpecialty(symptomBuf);
+    if(sp && isChip){
       intent.specialty = sp;
-      if(!isChip) intent.reason = text;
       askStep='urgency';
-      pushBot(`明白,帮你约${sp}。多急?`, ['尽快(3 天内)','一周内','两周内','不急']);
+      pushBot(l.gotSpec(spName(sp)), l.urg);
+    } else if(sp){
+      pendingSpec = sp;
+      intent.reason = symptomBuf;
+      askStep='confirmSpec';
+      pushBot(l.recSpec(spName(sp)), [l.confirmYes, l.confirmNo]);
     } else {
-      pushBot('我还没对上科室,选一个,或再描述一下症状:', Object.keys(SPECIALTIES));
+      missCount++;
+      if(missCount>=2) pushBot(l.probeFallback, specChips());
+      else pushBot(l.probe1);
+    }
+  } else if(askStep==='confirmSpec'){
+    if(isYesTxt(text)){
+      intent.specialty = pendingSpec;
+      askStep='urgency';
+      pushBot(l.gotSpec(spName(pendingSpec)), l.urg);
+    } else if(isNoTxt(text)){
+      pendingSpec = null; symptomBuf = ''; intent.reason = null; missCount = 0;
+      askStep='start';
+      pushBot(l.reAsk);
+    } else {
+      const sp2 = matchSpecialty(text);
+      symptomBuf = (symptomBuf + ' ' + text).trim();
+      intent.reason = symptomBuf;
+      if(sp2) pendingSpec = sp2;
+      pushBot(l.recSpec(spName(pendingSpec)), [l.confirmYes, l.confirmNo]);
     }
   } else if(askStep==='urgency'){
     intent.urgency = text; askStep='location';
     const last = store.get('intent');
-    pushBot('去哪个区域看?输入 ZIP 或城市名。', last && last.location ? ['用上次的:'+last.location] : []);
+    pushBot(l.locQ, last && last.location ? [l.lastPrefix+last.location] : []);
   } else if(askStep==='location'){
-    intent.location = text.replace('用上次的:',''); askStep='insurance';
+    intent.location = text.replace(T.zh.lastPrefix,'').replace(T.en.lastPrefix,''); askStep='insurance';
     const last = store.get('intent');
-    const chips = ['Blue Shield','Kaiser','Anthem','Aetna','自费'];
+    const chips = ['Blue Shield','Kaiser','Anthem','Aetna', l.selfPay];
     if(last && last.insurance && !chips.includes(last.insurance)) chips.unshift(last.insurance);
-    pushBot('用哪个保险?', chips);
+    pushBot(l.insQ, chips);
   } else if(askStep==='insurance'){
     intent.insurance = text; askStep='time';
-    pushBot('时间偏好?', ['工作日上午','工作日下午','周末','都行']);
+    pushBot(l.timeQ, l.time);
   } else if(askStep==='time'){
     intent.timePref = text; askStep='done';
     store.set('intent', intent);
     renderIntentCard();
   } else {
-    pushBot('意图卡片已生成,可以去预约了。想改条件就说"重新开始"。', text.includes('重新') ? [] : ['重新开始']);
-    if(text.includes('重新')){ resetAsk(); }
+    if(isRestart(text)){ resetAsk(); return; }
+    pushBot(l.doneHint, [l.restart]);
   }
 }
 function resetAsk(){
   intent = { specialty:null, reason:null, urgency:null, location:null, insurance:null, timePref:null };
-  askStep='start';
-  pushBot('好,重新来。哪里不舒服,或想约什么科?', Object.keys(SPECIALTIES));
+  askStep='start'; symptomBuf=''; missCount=0; pendingSpec=null;
+  pushBot(L().restartMsg);
 }
 function renderIntentCard(){
+  const l = L();
   const c = document.createElement('div'); c.className='icard';
-  c.innerHTML = `<h3><i></i>预约意图已就绪</h3>
-    <div class="irow"><span>科室</span><span>${intent.specialty}</span></div>
-    ${intent.reason?`<div class="irow"><span>原因</span><span>${intent.reason}</span></div>`:''}
-    <div class="irow"><span>紧急度</span><span>${intent.urgency}</span></div>
-    <div class="irow"><span>区域</span><span>${intent.location}</span></div>
-    <div class="irow"><span>保险</span><span>${intent.insurance}</span></div>
-    <div class="irow"><span>时间</span><span>${intent.timePref}</span></div>
-    <button class="go" onclick="startBooking()">去预约 · Agent 接手</button>`;
+  c.innerHTML = `<h3><i></i>${l.icTitle}</h3>
+    <div class="irow"><span>${l.icWho}</span><span>${curName()}</span></div>
+    <div class="irow"><span>${l.icSpec}</span><span>${spName(intent.specialty)}</span></div>
+    ${intent.reason?`<div class="irow"><span>${l.icReason}</span><span>${intent.reason}</span></div>`:''}
+    <div class="irow"><span>${l.icUrg}</span><span>${intent.urgency}</span></div>
+    <div class="irow"><span>${l.icLoc}</span><span>${intent.location}</span></div>
+    <div class="irow"><span>${l.icIns}</span><span>${intent.insurance}</span></div>
+    <div class="irow"><span>${l.icTime}</span><span>${intent.timePref}</span></div>
+    <button class="go" onclick="startBooking()">${l.icGo}</button>
+    <button class="save" onclick="saveAsk()">${l.icSave}</button>`;
   chat.appendChild(c);
   chat.scrollTop = chat.scrollHeight;
-  document.getElementById('bookDot').classList.add('show');
-  pushBot('确认无误就点"去预约",到关键步骤我会停下来等你确认。');
+  $('bookDot').classList.add('show');
+  pushBot(l.cardReady);
 }
 
 /* ================= Booking 状态机 ================= */
-const B = {
-  state:'idle', timers:[], startTs:null, tick:null,
-  doctor:null, slot:null, log:[]
-};
-const $ = id=>document.getElementById(id);
+const B = { state:'idle', timers:[], startTs:null, tick:null, doctor:null, slot:null, log:[] };
 function later(fn,ms){ const t=setTimeout(fn,ms); B.timers.push(t); }
 function clearTimers(){ B.timers.forEach(clearTimeout); B.timers=[]; }
 function logAdd(t){
-  const ts = new Date().toLocaleTimeString('zh-CN',{hour12:false});
+  const ts = new Date().toLocaleTimeString(LANG==='zh'?'zh-CN':'en-US',{hour12:false});
   B.log.push(ts+' · '+t);
-  const box = $('logbox');
   const d = document.createElement('div'); d.textContent = ts+' · '+t;
-  box.appendChild(d); box.scrollTop = box.scrollHeight;
+  $('logbox').appendChild(d); $('logbox').scrollTop = $('logbox').scrollHeight;
 }
 function toggleLog(){ const b=$('logbox'); b.style.display = b.style.display==='block'?'none':'block'; }
 function setStatus(o){
@@ -365,15 +782,16 @@ function startTimer(){
   if(B.tick) clearInterval(B.tick);
   B.tick = setInterval(()=>{
     const s = Math.floor((Date.now()-B.startTs)/1000);
-    $('metaL').textContent = `会话 #${String(B.startTs).slice(-4)} · 已运行 ${Math.floor(s/60)}:${String(s%60).padStart(2,'0')}`;
+    $('metaL').textContent = L().metaRun(String(B.startTs).slice(-4), Math.floor(s/60)+':'+String(s%60).padStart(2,'0'));
   }, 1000);
 }
 function switchTab(t){
-  $('tab-ask').classList.toggle('on', t==='ask');
-  $('tab-book').classList.toggle('on', t==='book');
-  $('page-ask').classList.toggle('on', t==='ask');
-  $('page-book').classList.toggle('on', t==='book');
+  ['ask','book','rec'].forEach(k=>{
+    $('tab-'+k).classList.toggle('on', t===k);
+    $('page-'+k).classList.toggle('on', t===k);
+  });
   if(t==='book') $('bookDot').classList.remove('show');
+  if(t==='rec') renderRecords();
 }
 function startBooking(){
   switchTab('book');
@@ -382,63 +800,64 @@ function startBooking(){
   stReady();
 }
 
-/* ---- 状态:意图就绪 ---- */
 function stReady(){
   B.state='ready';
-  setStatus({phase:'agent', phaseT:'待命', title:'意图就绪', step:0, badge:'待命', url:'zocdoc.com',
-    desc:`${intent.specialty} · ${intent.location} · ${intent.insurance} · ${intent.timePref}`,
-    act:'<button class="btn pg" onclick="stSearch()">开始自动预约</button><button class="btn ghost" onclick="switchTab(\'ask\')">回 Ask 改条件</button>'});
-  $('viewport').innerHTML = '<div class="site-h">Agent 待命中,点击下方开始</div>';
+  const l = L();
+  setStatus({phase:'agent', phaseT:l.phIdle, title:l.stReadyT, step:0, badge:l.bdIdle, url:'zocdoc.com',
+    desc:`${curName()} · ${spName(intent.specialty)} · ${intent.location} · ${intent.insurance} · ${intent.timePref}`,
+    act:`<button class="btn pg" onclick="stSearch()">${l.stReadyBtn}</button><button class="btn ghost" onclick="switchTab('ask')">${l.stReadyBack}</button>`});
+  $('viewport').innerHTML = `<div class="site-h">${l.stReadyVp}</div>`;
 }
 
-/* ---- 状态:搜索医生(agent) ---- */
 function stSearch(){
   B.state='search'; clearTimers();
   if(!B.startTs) startTimer();
+  const l = L();
   const spec = intent.specialty;
-  setStatus({phase:'agent', phaseT:'AGENT 正在操作', title:'搜索医生', step:1, badge:'LIVE',
-    url:`zocdoc.com/search?spec=${encodeURIComponent(spec)}`,
-    desc:`按你的条件筛选:${spec} · ${intent.location} 附近 · ${intent.insurance}`,
-    act:'<button class="btn ghost" onclick="pauseAgent()">暂停,我来接管</button>'});
+  setStatus({phase:'agent', phaseT:l.phAgent, title:l.stSearchT, step:1, badge:l.bdLive,
+    url:`zocdoc.com/search?spec=${spec}`,
+    desc:l.stSearchD(spName(spec), intent.location, intent.insurance),
+    act:`<button class="btn ghost" onclick="pauseAgent()">${l.pauseBtn}</button>`});
   const docs = MOCK_DOCS[spec] || MOCK_DOCS.default;
   const vp = $('viewport');
-  vp.innerHTML = `<div class="site-h">正在加载搜索结果…</div><div id="doclist"></div><div class="cursor"></div>`;
-  logAdd('打开 Zocdoc,输入科室与区域');
-  later(()=>{ vp.querySelector('.site-h').textContent = `搜索结果 · ${spec}`; logAdd('提交筛选:'+intent.insurance); }, 1000);
+  vp.innerHTML = `<div class="site-h">${l.loading}</div><div id="doclist"></div><div class="cursor"></div>`;
+  logAdd(l.lg.open);
+  later(()=>{ vp.querySelector('.site-h').textContent = l.results(spName(spec)); logAdd(l.lg.filter(intent.insurance)); }, 1000);
   docs.forEach((d,i)=>{
     later(()=>{
+      const sl = d.slots[LANG];
       const el = document.createElement('div');
       el.className='doc';
-      el.innerHTML = `<div class="av"></div><div><div class="nm">${d.n}</div><div class="sub">${spec} · ${d.r} ★ · ${d.d}${d.ins?'':' · 不收 '+intent.insurance}</div>${d.slots.length?`<div class="slotrow">${d.slots.slice(0,2).map(s=>`<span class="slot">${s}</span>`).join('')}</div>`:''}</div>`;
+      el.innerHTML = `<div class="av"></div><div><div class="nm">${d.n}</div><div class="sub">${spName(spec)} · ${d.r} ★ · ${d.d}${d.ins?'':l.noIns(intent.insurance)}</div>${sl.length?`<div class="slotrow">${sl.slice(0,2).map(s=>`<span class="slot">${s}</span>`).join('')}</div>`:''}</div>`;
       $('doclist').appendChild(el);
       requestAnimationFrame(()=>el.classList.add('in'));
-      if(!d.ins) later(()=>{ el.classList.add('dim'); logAdd('排除 '+d.n+'(保险不匹配)'); }, 700);
+      if(!d.ins) later(()=>{ el.classList.add('dim'); logAdd(l.lg.exclude(d.n)); }, 700);
     }, 1600 + i*800);
   });
-  later(()=>{ logAdd('按评分与距离排序,选出候选'); stGate(docs.filter(d=>d.ins)); }, 5200);
+  later(()=>{ logAdd(l.lg.sort); stGate(docs.filter(d=>d.ins)); }, 5200);
 }
 
-/* ---- 状态:确认医生(user 关卡 1) ---- */
 function stGate(cands){
   B.state='gate'; clearTimers();
-  B.doctor = cands[0]; B.slot = cands[0].slots[0];
-  setStatus({phase:'user', phaseT:'等待你确认', title:'确认医生', step:2, badge:'已暂停',
-    desc:'关卡 1 · 你选定医生和时段后,Agent 才继续填表',
-    act:'<button class="btn pa" onclick="stForm()">选定,继续预约</button><button class="btn ghost" onclick="stSearch()">都不合适,重新搜索</button>'});
+  const l = L();
+  B.doctor = cands[0]; B.slot = cands[0].slots[LANG][0];
+  setStatus({phase:'user', phaseT:l.phWaitU, title:l.gateT, step:2, badge:l.bdPaused,
+    desc:l.gateD,
+    act:`<button class="btn pa" onclick="stForm()">${l.gateGo}</button><button class="btn ghost" onclick="stSearch()">${l.gateNo}</button>`});
   const vp = $('viewport');
-  vp.innerHTML = `<div class="sheet"><h3>Agent 找到 ${cands.length} 位符合条件的医生,请选定医生和时段</h3>
+  vp.innerHTML = `<div class="sheet"><h3>${l.gateH(cands.length)}</h3>
     ${cands.map((d,i)=>`
       <div class="cand ${i===0?'sel':''}" data-i="${i}">
-        <div class="row"><span class="nm">${d.n}</span><span class="fit">${i===0?'最匹配':''}</span></div>
-        <p class="why">${d.r} ★ · ${d.d} · 收 ${intent.insurance} · ${d.best}</p>
-        <div class="slotrow">${d.slots.map((s,j)=>`<span class="slot ${i===0&&j===0?'sel':''}" data-i="${i}" data-s="${s}">${s}</span>`).join('')}</div>
+        <div class="row"><span class="nm">${d.n}</span><span class="fit">${i===0?l.gateBest:''}</span></div>
+        <p class="why">${d.r} ★ · ${d.d} · ${l.takesIns(intent.insurance)} · ${d.best[LANG]}</p>
+        <div class="slotrow">${d.slots[LANG].map((s,j)=>`<span class="slot ${i===0&&j===0?'sel':''}" data-i="${i}" data-s="${s}">${s}</span>`).join('')}</div>
       </div>`).join('')}
   </div>`;
   vp.querySelectorAll('.cand').forEach(c=>{
     c.addEventListener('click', ()=>{
       vp.querySelectorAll('.cand').forEach(x=>x.classList.remove('sel'));
       c.classList.add('sel');
-      const i = +c.dataset.i; B.doctor = cands[i]; B.slot = cands[i].slots[0];
+      const i = +c.dataset.i; B.doctor = cands[i]; B.slot = cands[i].slots[LANG][0];
       vp.querySelectorAll('.slot').forEach(s=>s.classList.toggle('sel', s.dataset.i==c.dataset.i && s.dataset.s===B.slot));
     });
   });
@@ -451,23 +870,23 @@ function stGate(cands){
       s.classList.add('sel');
     });
   });
-  logAdd('等待用户确认医生(关卡 1)');
+  logAdd(l.lg.wait1);
 }
 
-/* ---- 状态:填写表单(agent) ---- */
 function stForm(){
   B.state='form'; clearTimers();
-  logAdd(`用户选定 ${B.doctor.n} · ${B.slot}`);
-  setStatus({phase:'agent', phaseT:'AGENT 正在操作', title:'填写表单', step:3, badge:'LIVE',
+  const l = L();
+  logAdd(l.lg.picked(B.doctor.n, B.slot));
+  setStatus({phase:'agent', phaseT:l.phAgent, title:l.formT, step:3, badge:l.bdLive,
     url:'zocdoc.com/booking/new-patient',
-    desc:'Agent 填写非敏感字段,敏感信息稍后由你亲手输入',
-    act:'<button class="btn ghost" onclick="pauseAgent()">暂停,我来接管</button>'});
+    desc:l.formD,
+    act:`<button class="btn ghost" onclick="pauseAgent()">${l.pauseBtn}</button>`});
   const vp = $('viewport');
   const fields = [
-    ['预约医生', B.doctor.n + ' · ' + B.slot],
-    ['就诊原因', intent.reason || intent.specialty],
-    ['患者类型', '新患者'],
-    ['时间偏好', intent.timePref]
+    [l.fDoc, B.doctor.n + ' · ' + B.slot],
+    [l.fReason, intent.reason || spName(intent.specialty)],
+    [l.fType, l.fNew],
+    [l.fTime, intent.timePref]
   ];
   vp.innerHTML = `<div class="formmock">${fields.map((f,i)=>`<label>${f[0]}</label><div class="fv" id="fv${i}"></div>`).join('')}</div>`;
   fields.forEach((f,i)=>{
@@ -478,30 +897,30 @@ function stForm(){
         if(k>=f[1].length){ clearInterval(iv); el.classList.remove('typing'); }
       }, 28);
       B.timers.push(iv);
-      logAdd('填写:'+f[0]);
+      logAdd(l.lg.fill(f[0]));
     }, 500 + i*950);
   });
   later(stSecure, 500 + fields.length*950 + 900);
 }
 
-/* ---- 状态:敏感输入(user) ---- */
 function stSecure(){
   B.state='secure'; clearTimers();
-  setStatus({phase:'user', phaseT:'你正在操作', title:'敏感输入', step:4, badge:'接管中',
+  const l = L();
+  setStatus({phase:'user', phaseT:l.phYou, title:l.secT, step:4, badge:l.bdTake,
     url:'zocdoc.com/signin',
-    desc:'登录与保险信息由你亲手输入,Agent 已回避此页面',
-    act:'<button class="btn pa" onclick="secureDone()">输入完成,交还 Agent</button>'});
+    desc:l.secD,
+    act:`<button class="btn pa" onclick="secureDone()">${l.secDone}</button>`});
   $('viewport').innerHTML = `<div class="login">
-    <h4>登录 Zocdoc 并补全保险信息</h4>
-    <div class="field"><label>邮箱</label><input id="se" type="email" autocomplete="off" placeholder="you@example.com"><p class="ferr" id="ee">请填写邮箱</p></div>
-    <div class="field"><label>密码</label><input id="sp" type="password" placeholder="••••••••"><p class="ferr" id="ep">请填写密码</p></div>
-    <div class="field"><label>保险会员号(${intent.insurance})</label><input id="si" type="text" autocomplete="off" placeholder="Member ID"><p class="ferr" id="ei">请填写会员号</p></div>
+    <h4>${l.secH}</h4>
+    <div class="field"><label>${l.secMail}</label><input id="se" type="email" autocomplete="off" placeholder="you@example.com"><p class="ferr" id="ee">${l.errMail}</p></div>
+    <div class="field"><label>${l.secPw}</label><input id="sp" type="password" placeholder="••••••••"><p class="ferr" id="ep">${l.errPw}</p></div>
+    <div class="field"><label>${l.secIns(intent.insurance)}</label><input id="si" type="text" autocomplete="off" placeholder="Member ID"><p class="ferr" id="ei">${l.errIns}</p></div>
     <div class="shield">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l8 4v6c0 5-3.5 8.5-8 10-4.5-1.5-8-5-8-10V6l8-4z"/></svg>
-      <span>控制权在你手上。此页面的键盘输入不经过 Agent。当前为演示环境,这些内容不会上传或保存。</span>
+      <span>${l.secShield}</span>
     </div>
   </div>`;
-  logAdd('进入敏感输入,Agent 回避');
+  logAdd(l.lg.sec);
 }
 function secureDone(){
   let ok = true;
@@ -511,88 +930,455 @@ function secureDone(){
     if(bad) ok=false;
   });
   if(!ok) return;
-  logAdd('用户完成敏感输入,交还 Agent');
+  logAdd(L().lg.secDone);
   stReview();
 }
 
-/* ---- 状态:最终审查(user 关卡 2) ---- */
 function stReview(){
   B.state='review'; clearTimers();
-  setStatus({phase:'user', phaseT:'等待你确认', title:'最终审查', step:5, badge:'已暂停',
+  const l = L();
+  setStatus({phase:'user', phaseT:l.phWaitU, title:l.revT, step:5, badge:l.bdPaused,
     url:'zocdoc.com/booking/review',
-    desc:'关卡 2 · 这是提交前的最后一步,请核对全部信息',
-    act:'<button class="btn pa" onclick="stSubmit()">确认无误,提交预约</button><button class="btn ghost" onclick="stGateBack()">返回修改医生或时段</button>'});
+    desc:l.revD,
+    act:`<button class="btn pa" onclick="stSubmit()">${l.revGo}</button><button class="btn ghost" onclick="stGateBack()">${l.revBack}</button>`});
   $('viewport').innerHTML = `<div class="review">
-    <h4>预约信息核对</h4>
-    <div class="rrow"><span>医生</span><span>${B.doctor.n}</span></div>
-    <div class="rrow"><span>时段</span><span>${B.slot}</span></div>
-    <div class="rrow"><span>科室</span><span>${intent.specialty}</span></div>
-    <div class="rrow"><span>就诊原因</span><span>${intent.reason || intent.specialty}</span></div>
-    <div class="rrow"><span>区域</span><span>${intent.location} · ${B.doctor.d}</span></div>
-    <div class="rrow"><span>保险</span><span>${intent.insurance}</span></div>
-    <div class="rrow"><span>患者类型</span><span>新患者</span></div>
+    <h4>${l.revH}</h4>
+    <div class="rrow"><span>${l.icWho}</span><span>${curName()}</span></div>
+    <div class="rrow"><span>${l.rDoc}</span><span>${B.doctor.n}</span></div>
+    <div class="rrow"><span>${l.rSlot}</span><span>${B.slot}</span></div>
+    <div class="rrow"><span>${l.rSpec}</span><span>${spName(intent.specialty)}</span></div>
+    <div class="rrow"><span>${l.rReason}</span><span>${intent.reason || spName(intent.specialty)}</span></div>
+    <div class="rrow"><span>${l.rLoc}</span><span>${intent.location} · ${B.doctor.d}</span></div>
+    <div class="rrow"><span>${l.rIns}</span><span>${intent.insurance}</span></div>
+    <div class="rrow"><span>${l.rType}</span><span>${l.fNew}</span></div>
   </div>`;
-  logAdd('等待用户最终确认(关卡 2)');
+  logAdd(l.lg.wait2);
 }
 function stGateBack(){
-  const spec = intent.specialty;
-  const docs = (MOCK_DOCS[spec] || MOCK_DOCS.default).filter(d=>d.ins);
+  const docs = (MOCK_DOCS[intent.specialty] || MOCK_DOCS.default).filter(d=>d.ins);
   stGate(docs);
 }
 
-/* ---- 状态:提交(agent)→ 成功 ---- */
 function stSubmit(){
   B.state='submit'; clearTimers();
-  setStatus({phase:'agent', phaseT:'AGENT 正在操作', title:'提交预约', step:6, badge:'LIVE',
+  const l = L();
+  setStatus({phase:'agent', phaseT:l.phAgent, title:l.subT, step:6, badge:l.bdLive,
     url:'zocdoc.com/booking/confirm',
-    desc:'Agent 点击最终提交,等待网站确认',
-    act:''});
-  $('viewport').innerHTML = `<div class="site-h">提交中…</div><div class="cursor"></div>`;
-  logAdd('点击提交按钮');
-  later(()=>{ logAdd('收到网站确认页'); stSuccess(); }, 2400);
+    desc:l.subD, act:''});
+  $('viewport').innerHTML = `<div class="site-h">${l.subVp}</div><div class="cursor"></div>`;
+  logAdd(l.lg.click);
+  later(()=>{ logAdd(l.lg.got); stSuccess(); }, 2400);
 }
 function stSuccess(){
   B.state='done'; clearTimers();
   if(B.tick) clearInterval(B.tick);
-  setStatus({phase:'agent', phaseT:'完成', title:'预约成功', step:7, badge:'完成',
+  const l = L();
+  const dur = ($('metaL').textContent.split('· ')[1] || '').trim();
+  setStatus({phase:'agent', phaseT:l.phDone, title:l.okT, step:7, badge:l.bdDone,
     url:'zocdoc.com/booking/confirmed',
-    desc:'确认邮件会发到你填写的邮箱',
-    act:'<button class="btn pg" onclick="backToAsk()">回到 Ask</button><button class="btn ghost" onclick="rebook()">再约一个</button>'});
-  const steps = $('steps');
-  [...steps.children].forEach(el=>el.className='done');
+    desc:l.okD,
+    act:`<button class="btn pg" onclick="backToAsk()">${l.okBack}</button><button class="btn ghost" onclick="rebook()">${l.okAgain}</button>`});
+  [...$('steps').children].forEach(el=>el.className='done');
   $('viewport').innerHTML = `<div class="success">
     <div class="ok">✓</div>
-    <h4>已约上 ${B.doctor.n}</h4>
-    <p>${intent.specialty} · ${B.slot}<br>${intent.location} 附近 ${B.doctor.d} · ${intent.insurance}<br><br>全程 ${$('metaL').textContent.split('已运行 ')[1] || ''},共 2 次人工确认</p>
+    <h4>${l.okH(B.doctor.n)}</h4>
+    <p>${spName(intent.specialty)} · ${B.slot}<br>${intent.location} · ${B.doctor.d} · ${intent.insurance}<br><br>${l.okStats(dur)}</p>
   </div>`;
-  logAdd('预约成功,会话结束');
-  const done = store.get('bookings') || [];
+  logAdd(l.lg.end);
+  const done = mget('bookings') || [];
   done.push({doc:B.doctor.n, slot:B.slot, spec:intent.specialty, ts:Date.now()});
-  store.set('bookings', done);
+  mset('bookings', done);
+  rems.unshift({id:Date.now()+Math.random(), type:'appt', title:L().apptRem(B.doctor.n, B.slot), when:null});
+  mset('rems', rems);
+  updateBell();
 }
 function backToAsk(){
   switchTab('ask');
-  pushBot(`✅ 预约成功:${B.doctor.n} · ${intent.specialty} · ${B.slot}。确认邮件稍后送达。还需要约别的吗?`, ['重新开始']);
+  pushBot(L().okChat(B.doctor.n, spName(intent.specialty), B.slot), [L().restart]);
 }
-function rebook(){ resetBookingKeepIntent(); }
-function resetBookingKeepIntent(){
+function rebook(){
   B.doctor=null; B.slot=null; B.startTs=null;
-  $('metaL').textContent='会话未开始';
+  $('metaL').textContent = L().metaIdle;
   stReady();
 }
 
-/* ---- 暂停 / 接管 ---- */
 function pauseAgent(){
   const prev = B.state;
   clearTimers();
-  setStatus({phase:'user', phaseT:'你正在操作', title:'已接管', step:prev==='search'?1:3, badge:'接管中',
-    desc:'Agent 已暂停。真实环境下此处可直接操作网页;恢复后 Agent 会重新执行当前步骤',
-    act:`<button class="btn pa" onclick="${prev==='search'?'stSearch()':'stForm()'}">恢复,交还 Agent</button>`});
-  logAdd('用户暂停并接管');
+  const l = L();
+  setStatus({phase:'user', phaseT:l.phYou, title:l.pausedT, step:prev==='search'?1:3, badge:l.bdTake,
+    desc:l.pausedD,
+    act:`<button class="btn pa" onclick="${prev==='search'?'stSearch()':'stForm()'}">${l.resume}</button>`});
+  logAdd(l.lg.pause);
+}
+
+/* ================= 档案 ================= */
+let profile = mget('profile') || {};
+let docs = mget('docs') || [];
+let asks = mget('asks') || [];
+
+function toast(t){
+  let el = document.querySelector('.toast');
+  if(!el){ el = document.createElement('div'); el.className='toast'; document.body.appendChild(el); }
+  el.textContent = t; el.classList.add('show');
+  setTimeout(()=>el.classList.remove('show'), 1800);
+}
+const PKEYS = ['name','birth','sex','blood','marital','addr','allergy','meds','chronic','family'];
+function loadProfileForm(){
+  PKEYS.forEach(k=>{ const el = $('pf-'+k); if(el) el.value = profile[k] || ''; });
+}
+function saveProfile(){
+  PKEYS.forEach(k=>{ const el = $('pf-'+k); if(el) profile[k] = el.value.trim(); });
+  mset('profile', profile);
+  toast(L().savedProf);
+}
+function saveAsk(){
+  asks.unshift({ts:Date.now(), it:{...intent}});
+  mset('asks', asks);
+  toast(L().savedAsk);
+}
+function compressImg(file){
+  return new Promise(res=>{
+    const r = new FileReader();
+    r.onload = ()=>{
+      const img = new Image();
+      img.onload = ()=>{
+        const M = 900; let w = img.width, h = img.height;
+        if(Math.max(w,h) > M){ const k = M/Math.max(w,h); w = Math.round(w*k); h = Math.round(h*k); }
+        const c = document.createElement('canvas'); c.width = w; c.height = h;
+        c.getContext('2d').drawImage(img, 0, 0, w, h);
+        res(c.toDataURL('image/jpeg', 0.6));
+      };
+      img.src = r.result;
+    };
+    r.readAsDataURL(file);
+  });
+}
+$('photoIn').addEventListener('change', async e=>{
+  const cat = $('docCat').value;
+  const n = e.target.files.length;
+  for(const f of e.target.files){
+    const img = await compressImg(f);
+    docs.unshift({id:Date.now()+Math.random(), cat, ts:Date.now(), img});
+  }
+  try{
+    localStorage.setItem('hs_docs_'+curM, JSON.stringify(docs));
+    toast(L().savedPhoto(n, catName(cat)));
+  }catch(err){
+    docs = mget('docs') || [];
+    alert(L().quotaErr);
+  }
+  e.target.value = '';
+  renderThumbs();
+  if(cat==='rx'){
+    setTimeout(()=>{
+      if(confirm(L().rxAsk)){ openRem(); openRemForm({type:'med'}); }
+    }, 400);
+  }
+});
+function delDoc(id){
+  docs = docs.filter(d=>d.id!==id);
+  mset('docs', docs);
+  renderThumbs();
+}
+function delAsk(i){
+  asks.splice(i,1);
+  mset('asks', asks);
+  renderRecList();
+}
+function renderThumbs(){
+  $('thumbs').innerHTML = docs.map(d=>
+    `<div class="thumb"><img src="${d.img}"><span class="tcat">${catName(d.cat)} · ${new Date(d.ts).toLocaleDateString(LANG==='zh'?'zh-CN':'en-US')}</span><button class="tdel" onclick="delDoc(${d.id})">✕</button></div>`
+  ).join('') || `<p class="rhint" style="grid-column:1/-1;margin:0;">${L().thumbsEmpty}</p>`;
+}
+function renderRecList(){
+  const l = L();
+  const bk = mget('bookings') || [];
+  const dloc = LANG==='zh'?'zh-CN':'en-US';
+  let h = '';
+  h += asks.map((a,i)=>
+    `<div class="ritem"><div><div>${l.histAsk} · ${spName(a.it.specialty)||''}${a.it.reason?' · '+a.it.reason:''}</div><div class="rsub">${new Date(a.ts).toLocaleString(dloc)} · ${a.it.urgency||''}</div></div><button onclick="delAsk(${i})">${l.del}</button></div>`
+  ).join('');
+  h += bk.slice().reverse().map(b=>
+    `<div class="ritem"><div><div>${l.histBook} · ${b.doc} · ${spName(b.spec)}</div><div class="rsub">${b.slot} · ${new Date(b.ts).toLocaleDateString(dloc)}</div></div><span></span></div>`
+  ).join('');
+  $('recList').innerHTML = h || `<p class="rhint" style="margin:0;">${l.histEmpty}</p>`;
+}
+function renderRecords(){ renderMembers(); loadProfileForm(); renderThumbs(); renderRecList(); }
+
+/* ================= 提醒 ================= */
+let rems = mget('rems') || [];
+let fired = store.get('fired') || {};
+const MEDT = ['08:00','12:30','20:00'];
+function openRem(){
+  renderMembers();
+  renderRems();
+  $('remview').classList.remove('hidden');
+  document.body.style.overflow = 'hidden';
+}
+function closeRem(){
+  $('remview').classList.add('hidden');
+  document.body.style.overflow = '';
+  updateBell();
+}
+function updateBell(){
+  const now = Date.now();
+  const need = members.some(mb=>{
+    const list = mb.id===curM ? rems : (store.get('rems_'+mb.id) || []);
+    return list.some(r=>{
+      if(r.type!=='med' && !r.when) return true;
+      const nx = nextOcc(r);
+      return nx && nx - now < 86400000;
+    });
+  });
+  $('bellDot').classList.toggle('show', need);
+}
+function buildMedChips(){
+  $('medTimes').innerHTML = MEDT.map(t=>`<button type="button" class="${t!=='12:30'?'sel':''}" data-t="${t}" onclick="this.classList.toggle('sel')">${t}</button>`).join('');
+}
+function openRemForm(preset){
+  $('remForm').classList.remove('hidden');
+  if(preset && preset.type) $('rm-type').value = preset.type;
+  if(preset && preset.title) $('rm-title').value = preset.title;
+  onRemType();
+}
+function onRemType(){
+  const t = $('rm-type').value;
+  $('rowWhen').classList.toggle('hidden', t==='med');
+  $('rowMed').classList.toggle('hidden', t!=='med');
+}
+function saveRem(){
+  const l = L();
+  const type = $('rm-type').value;
+  const title = $('rm-title').value.trim();
+  if(!title){ $('rm-title').focus(); return; }
+  const rem = {id:Date.now()+Math.random(), type, title};
+  if(type==='med'){
+    const times = [...$('medTimes').querySelectorAll('button.sel')].map(b=>b.dataset.t);
+    if(!times.length) return;
+    const days = parseInt($('rm-days').value,10) || 7;
+    const st = new Date(); st.setHours(0,0,0,0);
+    rem.times = times; rem.days = days; rem.start = st.getTime();
+  }else{
+    const v = $('rm-when').value;
+    rem.when = v ? new Date(v).getTime() : null;
+  }
+  rems.unshift(rem); mset('rems', rems);
+  $('remForm').classList.add('hidden');
+  $('rm-title').value=''; $('rm-when').value=''; $('rm-days').value='';
+  toast(l.remSaved); renderRems(); updateBell();
+}
+function delRem(id){ rems = rems.filter(r=>r.id!==id); mset('rems', rems); renderRems(); updateBell(); }
+function setRemWhen(id, v){
+  const r = rems.find(x=>x.id===id);
+  if(r){ r.when = v ? new Date(v).getTime() : null; mset('rems', rems); renderRems(); toast(L().remSaved); updateBell(); }
+}
+function nextOcc(r){
+  const now = Date.now();
+  if(r.type==='med'){
+    for(let d=0; d<r.days; d++){
+      const day = new Date(r.start + d*86400000);
+      for(const t of r.times){
+        const [h,m] = t.split(':').map(Number);
+        const ts = new Date(day.getFullYear(), day.getMonth(), day.getDate(), h, m).getTime();
+        if(ts > now) return ts;
+      }
+    }
+    return null;
+  }
+  return (r.when && r.when > now) ? r.when : null;
+}
+function fmtTs(ts){
+  return new Date(ts).toLocaleString(LANG==='zh'?'zh-CN':'en-US',{month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'});
+}
+function renderRems(){
+  const l = L();
+  $('remList').innerHTML = rems.map(r=>{
+    const nx = nextOcc(r);
+    const typeL = l.rType[r.type] || r.type;
+    let sub;
+    if(r.type!=='med' && !r.when){
+      sub = `${l.noTime} <input type="datetime-local" style="font-size:12px;border:1px solid var(--line);border-radius:6px;padding:3px 6px;margin-top:3px;" onchange="setRemWhen(${r.id},this.value)">`;
+    }else{
+      sub = nx ? (l.nextAt + fmtTs(nx)) : l.past;
+    }
+    return `<div class="ritem"><div style="min-width:0;"><div>${typeL} · ${r.title}</div><div class="rsub">${sub}</div></div><div style="display:flex;gap:12px;align-items:center;flex-shrink:0;"><button style="color:var(--green-deep);" onclick="calRem(${r.id})">${l.addCal}</button><button onclick="delRem(${r.id})">${l.del}</button></div></div>`;
+  }).join('') || `<p class="rhint" style="margin:0;">${l.remEmpty}</p>`;
+}
+function icsDt(ts){
+  const d = new Date(ts), p = n=>String(n).padStart(2,'0');
+  return d.getFullYear()+p(d.getMonth()+1)+p(d.getDate())+'T'+p(d.getHours())+p(d.getMinutes())+'00';
+}
+function calRem(id){
+  const r = rems.find(x=>x.id===id); if(!r) return;
+  const esc = s=>String(s).replace(/([,;])/g,'\\$1');
+  const ev = [];
+  if(r.type==='med'){
+    r.times.forEach((t,i)=>{
+      const [h,m] = t.split(':').map(Number);
+      const st = new Date(r.start); st.setHours(h,m,0,0);
+      ev.push('BEGIN:VEVENT\nUID:'+r.id+'-'+i+'@familyhealth\nDTSTART:'+icsDt(st.getTime())+'\nDURATION:PT15M\nRRULE:FREQ=DAILY;COUNT='+r.days+'\nSUMMARY:'+esc('💊 '+r.title)+'\nBEGIN:VALARM\nACTION:DISPLAY\nDESCRIPTION:'+esc(r.title)+'\nTRIGGER:PT0M\nEND:VALARM\nEND:VEVENT');
+    });
+  }else{
+    if(!r.when){ toast(L().noTime); return; }
+    ev.push('BEGIN:VEVENT\nUID:'+r.id+'@familyhealth\nDTSTART:'+icsDt(r.when)+'\nDURATION:PT30M\nSUMMARY:'+esc(r.title)+'\nBEGIN:VALARM\nACTION:DISPLAY\nDESCRIPTION:'+esc(r.title)+'\nTRIGGER:-PT30M\nEND:VALARM\nEND:VEVENT');
+  }
+  const ics = 'BEGIN:VCALENDAR\nVERSION:2.0\nPRODID:-//FamilyHealth//Reminders//EN\n'+ev.join('\n')+'\nEND:VCALENDAR';
+  const blob = new Blob([ics.replace(/\n/g,'\r\n')], {type:'text/calendar'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob); a.download = 'familyhealth-reminder.ics';
+  document.body.appendChild(a); a.click(); a.remove();
+}
+function askNotif(){
+  if(!('Notification' in window)){ toast(L().notifNo); return; }
+  Notification.requestPermission().then(p=>{ toast(p==='granted' ? L().notifOn : L().notifNo); });
+}
+function fireRem(key, title){
+  if(fired[key]) return;
+  fired[key] = 1; store.set('fired', fired);
+  toast(L().dueNow(title));
+  if(('Notification' in window) && Notification.permission==='granted'){
+    try{ new Notification('FamilyHealth', {body:title}); }catch(e){}
+  }
+}
+function checkDue(){
+  const now = Date.now(), win = 90000;
+  members.forEach(mb=>{
+    const list = mb.id===curM ? rems : (store.get('rems_'+mb.id) || []);
+    const tag = members.length>1 ? mName(mb)+' · ' : '';
+    list.forEach(r=>{
+      if(r.type==='med'){
+        const today = new Date(); today.setHours(0,0,0,0);
+        const dayIdx = Math.floor((today.getTime()-r.start)/86400000);
+        if(dayIdx<0 || dayIdx>=r.days) return;
+        r.times.forEach(t=>{
+          const [h,m] = t.split(':').map(Number);
+          const ts = new Date(today.getFullYear(), today.getMonth(), today.getDate(), h, m).getTime();
+          if(now>=ts && now-ts<win) fireRem(r.id+'|'+today.toDateString()+'|'+t, tag+'💊 '+r.title);
+        });
+      }else if(r.when && now>=r.when && now-r.when<win){
+        fireRem(r.id+'|once', tag+r.title);
+      }
+    });
+  });
+}
+
+/* ---- 病历首页(永远中英双语) ---- */
+function openDocView(){
+  const bk = mget('bookings') || [];
+  const latest = asks[0];
+  const age = profile.birth ? (new Date().getFullYear() - parseInt(profile.birth,10)) : null;
+  const byCat = {};
+  docs.forEach(d=>{ (byCat[d.cat] = byCat[d.cat] || []).push(d); });
+  const NA = '未填写 N/A';
+  $('dv-body').innerHTML = `
+    <h2>病历首页 · Patient Summary</h2>
+    <p class="dv-sub">由 FamilyHealth 根据患者档案整理 Compiled by FamilyHealth from patient records · ${new Date().toLocaleDateString('zh-CN')} · 供就诊参考,非诊断文书 For clinical reference only</p>
+    <div class="dv-sec"><h4>患者信息 Patient Information</h4>
+      <div class="dv-row"><b>姓名 Name</b><span>${profile.name||NA}</span></div>
+      <div class="dv-row"><b>性别 / 年龄 Sex / Age</b><span>${bi(SEXL,profile.sex)||NA}${age?' / '+age:''}</span></div>
+      <div class="dv-row"><b>血型 Blood Type</b><span>${profile.blood||NA}</span></div>
+      <div class="dv-row"><b>婚姻状况 Marital</b><span>${bi(MARL,profile.marital)||NA}</span></div>
+      <div class="dv-row"><b>地址 Address</b><span>${profile.addr||NA}</span></div>
+      <div class="dv-row"><b>保险 Insurance</b><span>${(latest&&latest.it.insurance)||intent.insurance||NA}</span></div>
+    </div>
+    <div class="dv-sec"><h4>主诉 Chief Complaint</h4>
+      <div class="dv-row"><span>${latest ? ((latest.it.reason||spBi(latest.it.specialty))+(latest.it.urgency?' · 紧急程度 Urgency: '+latest.it.urgency:'')) : '暂无问诊记录 No consultations yet'}</span></div>
+    </div>
+    <div class="dv-sec"><h4>近期问诊记录 Recent Consultations</h4>
+      ${asks.length ? asks.slice(0,5).map(a=>`<div class="dv-row"><b>${new Date(a.ts).toLocaleDateString('zh-CN')}</b><span>${spBi(a.it.specialty)||''}${a.it.reason?' · '+a.it.reason:''}</span></div>`).join('') : '<div class="dv-row"><span>无 None</span></div>'}
+    </div>
+    <div class="dv-sec"><h4>过敏史 Allergies</h4><div class="dv-row"><span>${profile.allergy||NA}</span></div></div>
+    <div class="dv-sec"><h4>长期用药 Current Medications</h4><div class="dv-row"><span>${profile.meds||NA}</span></div></div>
+    <div class="dv-sec"><h4>慢性病史 Chronic Conditions</h4><div class="dv-row"><span>${profile.chronic||NA}</span></div></div>
+    <div class="dv-sec"><h4>家族史 Family History</h4><div class="dv-row"><span>${profile.family||NA}</span></div></div>
+    <div class="dv-sec"><h4>近期预约 Recent Appointments</h4>
+      ${bk.length ? bk.slice(-3).reverse().map(b=>`<div class="dv-row"><b>${new Date(b.ts).toLocaleDateString('zh-CN')}</b><span>${b.doc} · ${spBi(b.spec)} · ${b.slot}</span></div>`).join('') : '<div class="dv-row"><span>无 None</span></div>'}
+    </div>
+    <div class="dv-sec"><h4>资料附件 Attachments(${docs.length})</h4>
+      ${docs.length ? Object.entries(byCat).map(([c,arr])=>`<p class="dv-cat">${catBi(c)}(${arr.length})</p><div class="dv-imgs">${arr.map(d=>`<figure><img src="${d.img}"><figcaption>${catBi(c)} · ${new Date(d.ts).toLocaleDateString('zh-CN')}</figcaption></figure>`).join('')}</div>`).join('') : '<div class="dv-row"><span>无 None</span></div>'}
+    </div>`;
+  $('docview').classList.remove('hidden');
+  document.body.style.overflow = 'hidden';
+}
+function closeDocView(){
+  $('docview').classList.add('hidden');
+  document.body.style.overflow = '';
+}
+
+/* ================= 语言应用 ================= */
+function applyLang(){
+  const l = L();
+  document.documentElement.lang = LANG==='zh' ? 'zh-CN' : 'en';
+  $('langBtn').textContent = l.langBtn;
+  $('tabBookT').textContent = l.tabBook;
+  $('tabRecT').textContent = l.tabRec;
+  askInput.placeholder = l.ph;
+  $('bookEmpty').innerHTML = l.bkEmpty + `<br><button onclick="switchTab('ask')">${l.bkGoAsk}</button>`;
+  $('stepNames').innerHTML = l.stepNames.map(s=>`<span>${s}</span>`).join('');
+  if(!B.startTs) $('metaL').textContent = l.metaIdle;
+  $('logBtnT').textContent = l.logBtn;
+  /* records */
+  $('btnGen').textContent = l.recGen;
+  $('h3Basic').textContent = l.basic;
+  ['Name','Birth','Sex','Blood','Marital','Addr','Allergy','Meds','Chronic','Family'].forEach(k=>{
+    $('lb'+k).textContent = l['lb'+k];
+  });
+  $('pf-name').placeholder = l.phName;
+  $('pf-addr').placeholder = l.phAddr;
+  $('pf-allergy').placeholder = l.phAllergy;
+  $('pf-meds').placeholder = l.phMeds;
+  $('pf-chronic').placeholder = l.phChronic;
+  $('pf-family').placeholder = l.phFamily;
+  const sx = $('pf-sex');
+  sx.options[0].text = l.optNA; sx.options[1].text = SEXL.M[LANG]; sx.options[2].text = SEXL.F[LANG];
+  const mr = $('pf-marital');
+  mr.options[0].text = l.optNA;
+  ['single','married','divorced','widowed'].forEach((k,i)=>{ mr.options[i+1].text = MARL[k][LANG]; });
+  const dc = $('docCat'); const cur = dc.value;
+  dc.innerHTML = Object.keys(CATS).map(k=>`<option value="${k}">${catName(k)}</option>`).join('');
+  if(cur && CATS[cur]) dc.value = cur;
+  $('btnSaveProf').textContent = l.saveProf;
+  $('h3Photo').textContent = l.photoH;
+  $('photoHint').textContent = l.photoHint;
+  $('btnPhoto').textContent = l.photoBtn;
+  $('h3Hist').textContent = l.histH;
+  $('h3Rem').textContent = l.h3Rem;
+  $('remHint').textContent = l.remHint;
+  $('btnAddRem').textContent = l.btnAddRem;
+  $('btnNotif').textContent = l.btnNotif;
+  $('lbRType').textContent = l.lbRType;
+  $('lbRTitle').textContent = l.lbRTitle;
+  $('lbRWhen').textContent = l.lbRWhen;
+  $('lbRTimes').textContent = l.lbRTimes;
+  $('lbRDays').textContent = l.lbRDays;
+  $('rm-title').placeholder = l.phRTitle;
+  const rt = $('rm-type');
+  rt.options[0].text = l.rType.med; rt.options[1].text = l.rType.check; rt.options[2].text = l.rType.appt;
+  $('btnSaveRem').textContent = l.btnSaveRem;
+  renderMembers();
+  if($('page-rec').classList.contains('on')) renderRecords();
+  if(B.state==='ready') stReady();
+}
+function setLang(lg){
+  LANG = lg; store.set('lang', lg);
+  applyLang();
+  if(askStep==='start' && !userSpoke){
+    chat.innerHTML = '';
+    symptomBuf=''; missCount=0; pendingSpec=null;
+    pushBot(L().greet);
+  }
 }
 
 /* ================= 启动 ================= */
-pushBot('你好,我是 HealthStory。哪里不舒服,或想约什么科?到选医生和提交这两个关键步骤,一定会停下来等你确认。', Object.keys(SPECIALTIES));
+applyLang();
+buildMedChips();
+onRemType();
+setInterval(checkDue, 30000);
+checkDue();
+updateBell();
+renderRecords();
+pushBot(L().greet);
 </script>
 </body>
 </html>
