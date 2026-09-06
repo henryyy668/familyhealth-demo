@@ -34,7 +34,7 @@ header{display:flex;align-items:center;justify-content:space-between;padding:4px
 .bdot{position:absolute;top:2px;right:3px;width:8px;height:8px;border-radius:50%;background:var(--amber);border:1.5px solid var(--cream);display:none;}
 .bdot.show{display:block;}
 @media (max-width:479px){.brand span{display:none;}}
-#remview,#platview,#ordview{position:fixed;inset:0;background:var(--cream);z-index:40;overflow-y:auto;-webkit-overflow-scrolling:touch;display:flex;justify-content:center;}
+#remview,#platview,#ordview,#memview,#walletview,#compview{position:fixed;inset:0;background:var(--cream);z-index:40;overflow-y:auto;-webkit-overflow-scrolling:touch;display:flex;justify-content:center;}
 .rv-wrap{width:100%;max-width:460px;padding:0 12px max(30px, env(safe-area-inset-bottom));}
 .rv-bar{position:sticky;top:0;background:var(--cream);display:flex;justify-content:space-between;align-items:center;padding:16px 2px 10px;z-index:2;}
 .rv-bar h3{font-size:18px;font-weight:600;}
@@ -131,6 +131,13 @@ header{display:flex;align-items:center;justify-content:space-between;padding:4px
 .svcchip.pick{cursor:pointer;}
 .svcchip.sel{border-color:var(--amber);background:#FDF9F0;color:var(--amber-deep);}
 .btn.sm{padding:11px;font-size:14px;}
+.btn.memb{background:#FDF9F0;border:1.5px solid var(--amber);color:var(--amber-deep);}
+.olink{border:none;background:none;font-size:12px;color:var(--green-deep);text-decoration:underline;cursor:pointer;font-family:var(--sans);padding:0;}
+.olink.red{color:#A32D2D;}
+.mtab{display:grid;grid-template-columns:1fr 74px 92px;font-size:12px;}
+.mtab div{padding:9px 4px;border-bottom:1px dashed var(--line);}
+.mtab .mh{font-weight:600;color:var(--muted);font-size:11px;}
+.mtab .vip{color:var(--green-deep);font-weight:500;}
 #svcScroll{flex:1;overflow-y:auto;padding-bottom:max(14px, env(safe-area-inset-bottom));-webkit-overflow-scrolling:touch;}
 .doc{display:flex;gap:10px;padding:10px;border:1px solid var(--line);border-radius:10px;margin-bottom:9px;background:#fff;opacity:0;transition:opacity .4s;}
 .doc.in{opacity:1;}
@@ -296,7 +303,8 @@ header{display:flex;align-items:center;justify-content:space-between;padding:4px
 <div class="page on" id="page-rec">
   <div id="recScroll">
     <div class="mbar" id="memberBar"></div>
-    <button class="btn pg" id="btnGen" onclick="openDocView()" style="margin:4px 0 14px;"></button>
+    <button class="btn pg" id="btnGen" onclick="openDocView()" style="margin:4px 0 10px;"></button>
+    <button class="btn memb" id="btnMem" onclick="openMem()" style="margin:0 0 14px;"></button>
 
     <div class="rcard">
       <h3 id="h3Basic"></h3>
@@ -335,6 +343,10 @@ header{display:flex;align-items:center;justify-content:space-between;padding:4px
 <div class="page" id="page-svc">
   <div id="svcScroll">
     <p class="rhint" id="svcHint" style="margin:2px 2px 12px;"></p>
+    <div class="rcard" style="display:flex;justify-content:space-between;align-items:center;">
+      <div><div style="font-size:12px;color:var(--muted);" id="walletL"></div><div style="font-size:22px;font-weight:600;font-family:var(--disp);" id="walletBal"></div></div>
+      <button class="btn pg sm" style="width:auto;padding:10px 20px;" id="btnTopup" onclick="openWallet()"></button>
+    </div>
     <div class="rcard hidden" id="myOrdCard">
       <h3 id="myOrdersT"></h3>
       <div id="myOrdList"></div>
@@ -399,14 +411,79 @@ header{display:flex;align-items:center;justify-content:space-between;padding:4px
       <p class="rhint" style="margin-bottom:4px;"><span id="ordForL"></span>: <span id="ordForV"></span></p>
       <label id="ordSvcT" style="display:block;font-size:11px;color:var(--muted);margin:8px 0 6px;"></label>
       <div class="svcrow" id="ordChips"></div>
+      <label id="authT" style="display:block;font-size:11px;color:var(--muted);margin:12px 0 6px;"></label>
+      <div class="svcrow" id="authChips"></div>
+      <p class="rhint" id="authHint" style="margin:2px 0 6px;font-size:11px;"></p>
       <textarea id="ordNote" rows="3" style="width:100%;padding:10px 12px;font-size:14px;font-family:var(--sans);border:1.5px solid var(--line);border-radius:8px;background:#FCFBF8;outline:none;margin-top:4px;resize:none;"></textarea>
       <button class="btn pa" id="btnOrdSubmit" onclick="submitOrd()" style="margin-top:12px;"></button>
+    </div>
+    <div class="rv-card hidden" id="ordPay">
+      <h4 style="font-size:15px;font-weight:600;margin-bottom:10px;" id="payT"></h4>
+      <div class="rrow"><span id="payAstL"></span><span id="payAstV"></span></div>
+      <div class="rrow"><span id="payForL"></span><span id="payForV"></span></div>
+      <div class="rrow"><span id="paySvcL"></span><span id="paySvcV" style="font-weight:600;"></span></div>
+      <p class="rhint" id="escrowHint" style="margin:10px 0 0;"></p>
+      <p class="rhint" id="payBalInfo" style="margin:10px 0 0;"></p>
+      <button class="btn pg" id="btnPayBal" onclick="payOrdBal()" style="margin-top:12px;"></button>
+      <button class="btn pa" id="btnPay" onclick="payOrd()" style="margin-top:10px;"></button>
+      <button class="btn ghost" id="btnPayBack" onclick="payBack()" style="margin-top:8px;"></button>
     </div>
     <div class="rv-card hidden" id="ordOk" style="text-align:center;">
       <div style="width:52px;height:52px;border-radius:50%;background:var(--green);color:#fff;font-size:26px;display:flex;align-items:center;justify-content:center;margin:6px auto 12px;">✓</div>
       <h4 style="font-size:16px;font-weight:600;margin-bottom:6px;" id="ordOkT"></h4>
       <p class="rhint" id="ordOkD" style="margin:0 0 12px;"></p>
       <button class="btn pg" id="btnOrdDone" onclick="closeOrd()"></button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ 钱包 ============ -->
+<div id="walletview" class="hidden">
+  <div class="rv-wrap">
+    <div class="rv-bar"><h3 id="wvTitle"></h3><button onclick="closeWallet()" aria-label="close">✕</button></div>
+    <div class="rv-card" style="text-align:center;">
+      <p class="rhint" id="wvBalL" style="margin:0;"></p>
+      <div style="font-family:var(--disp);font-size:34px;font-weight:600;margin:4px 0 14px;" id="wvBal"></div>
+      <div class="svcrow" style="justify-content:center;" id="wvOpts"></div>
+      <p class="rhint" id="wvBonus" style="margin:10px 0 0;text-align:center;"></p>
+    </div>
+    <div class="rv-card" style="margin-top:12px;">
+      <h4 style="font-size:14px;font-weight:600;margin-bottom:6px;" id="wvTxnT"></h4>
+      <div id="wvTxns"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ 投诉 ============ -->
+<div id="compview" class="hidden">
+  <div class="rv-wrap">
+    <div class="rv-bar"><h3 id="compTitleT"></h3><button onclick="closeComp()" aria-label="close">✕</button></div>
+    <div class="rv-card" id="compMain">
+      <p class="rhint" id="compOrd" style="margin-bottom:8px;"></p>
+      <div class="svcrow" id="compChips"></div>
+      <textarea id="compNote" rows="3" style="width:100%;padding:10px 12px;font-size:14px;font-family:var(--sans);border:1.5px solid var(--line);border-radius:8px;background:#FCFBF8;outline:none;margin-top:6px;resize:none;"></textarea>
+      <button class="btn pa" id="btnCompSubmit" onclick="submitComp()" style="margin-top:12px;"></button>
+    </div>
+    <div class="rv-card hidden" id="compOk" style="text-align:center;">
+      <div style="width:52px;height:52px;border-radius:50%;background:var(--green);color:#fff;font-size:26px;display:flex;align-items:center;justify-content:center;margin:6px auto 12px;">✓</div>
+      <h4 style="font-size:16px;font-weight:600;margin-bottom:6px;" id="compOkT"></h4>
+      <p class="rhint" id="compOkD" style="margin:0 0 12px;"></p>
+      <button class="btn pg" id="btnCompDone" onclick="closeComp()"></button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ 会员(假门) ============ -->
+<div id="memview" class="hidden">
+  <div class="rv-wrap">
+    <div class="rv-bar"><h3 id="memTitle"></h3><button onclick="closeMem()" aria-label="close">✕</button></div>
+    <div class="rv-card">
+      <div class="mtab" id="memTable"></div>
+      <p class="rhint" id="memPrice" style="margin:12px 0 0;text-align:center;"></p>
+      <button class="btn pa" id="btnMemFam" onclick="fakeDoor('family')" style="margin-top:12px;"></button>
+      <button class="btn ghost" id="btnMemSolo" onclick="fakeDoor('solo')" style="margin-top:8px;"></button>
+      <p class="rhint hidden" id="memOkMsg" style="margin:12px 0 0;color:var(--green-deep);"></p>
+      <p class="rhint" id="memNote" style="margin:10px 0 0;font-size:10px;text-align:center;"></p>
     </div>
   </div>
 </div>
@@ -614,10 +691,42 @@ zh:{
   jobsUnit:'单', svcBook:'预约这位助理', myOrdersT:'我的委托',
   ordPending:'已提交,等待助理接单', histOrd:'委托',
   ordTitle:'委托助理', ordSvcT:'选择服务', ordNotePh:'补充说明(可选):目标医院、时间要求等',
-  ordSubmit:'提交委托', ordOkT:'委托已提交', ordOkD:'助理将在 2 小时内联系你(演示环境)。记录已存入档案。', ordDone:'完成',
+  ordSubmit:'提交委托', ordOkT:'委托已提交', ordOkD:'款项已托管;助理将在 2 小时内联系你(演示)。可在委托记录里撤销病历授权或确认完成。', ordDone:'完成',
   joinT:'你是患者助理?', joinHint:'入驻 FamilyHealth 开设你的 Online Office:自主定价接单,AI 帮你整理病历、跑标准预约,让你服务更多家庭。需通过身份核查与 HIPAA 培训确认。',
   btnJoin:'入驻开设 Office', lbJName:'姓名', lbJCity:'城市', lbJLang:'语言', lbJSpec:'专长', lbJBio:'简介',
   btnJoinSubmit:'提交申请', jOk:'申请已收到,审核通过后开通(演示)',
+  astL:'助理',
+  authT:'病历授权', authNone:'不授权', authBasic:'仅主诉 + 保险', authFull:'完整病历首页',
+  authHint:'有效期为委托期间 + 7 天,可随时撤销,助理每次查看都有记录。',
+  authScope:'授权', authUntil:'有效至', authViews:n=>`查看 ${n} 次`, authRevoked:'授权已撤销', revokedToast:'授权已撤销,助理已无法查看',
+  avBtn:'助理视角', revokeBtn:'撤销授权', revokeAsk:'撤销后助理将立即无法查看这份病历,确定?',
+  avBanner:(n,d)=>`授权视图 · 只读 · 助理 ${n} · 有效至 ${d}`,
+  avRevokedT:'授权已失效', avRevokedD:'患者已撤销授权或授权已过期,无法查看此病历。',
+  payT:'确认支付', paySvcL:'服务',
+  escrowHint:'款项由平台托管,服务完成、你确认后才结算给助理(含 20% 平台服务费)。演示环境不会真实扣款。',
+  payBtn:p=>`卡支付 $${p}(演示)`, payBack:'返回修改',
+  escrowHeld:'款项托管中', escrowReleased:'已完成 · 已结算给助理',
+  confirmDone:'确认完成,释放款项', releaseAsk:p=>`确认服务已完成?$${p} 将结算给助理。`, releasedToast:p=>`已释放 $${p} 给助理(演示)`,
+  memBanner:'升级 FamilyHealth 家庭会员', memBannerVip:'家庭会员 · 内测已解锁',
+  memTitle:'会员', memFree:'免费', memVip:'家庭会员',
+  memRows:[['家庭成员','2 人','无限'],['AI 自动预约','每月 1 次','无限'],['报告智能解读','—','✓'],['病历首页语言','中英','中英西等'],['助理委托','原价','95 折']],
+  memPriceLine:'个人 $9.99/月 · 家庭 $19.99/月 · 年付 8 折',
+  memBtnFam:'升级家庭版 $19.99/月', memBtnSolo:'个人版 $9.99/月',
+  memOk:'内测期免费,已为你解锁全部会员功能。正式版起 $9.99/月。',
+  memOkToast:'内测期免费,会员功能已解锁',
+  memNote:'演示环境,不会真实扣款,点击数据仅记录在本机。',
+  walletT:'钱包', balL:'余额', topupBtn:'充值',
+  topupBonus:'充 $200 送 $10 · 演示环境不会真实扣款', txnT:'流水',
+  txnMap:{topup:'充值', pay:'委托支付', refund:'投诉退款'},
+  topupOk:a=>`已充值 $${a}(演示)`,
+  payBalBtn:p=>`余额支付 $${p}`, balNow:b=>`当前余额 $${b}`, balLow:'余额不足', goTopup:'去充值',
+  compBtn:'投诉', compT:'发起投诉',
+  compReasons:['未按约定完成','服务态度问题','收费争议','其他'],
+  compNotePh:'补充说明(可选)', compSubmit:'提交投诉',
+  compOkT:'平台已受理', compOkD:'我们将在 24 小时内介入;托管中的款项已冻结,处理期间不会结算给助理(演示)。',
+  compStatus:'投诉处理中 · 平台介入', compResolved:'投诉已解决 · 已退款',
+  judgeBtn:'(演示)模拟裁决:退款', judgeToast:a=>`裁决完成,$${a} 已退回钱包`,
+  escrowFrozen:'款项已冻结(投诉处理中)', escrowRefunded:'已退款至钱包',
   recGen:'生成病历首页 · 给医生看', basic:'基本信息',
   lbName:'姓名', lbBirth:'出生年份', lbSex:'性别', lbBlood:'血型', lbMarital:'婚姻状况', lbAddr:'地址',
   lbAllergy:'过敏史', lbMeds:'长期用药', lbChronic:'慢性病史', lbFamily:'家族史',
@@ -708,10 +817,42 @@ en:{
   jobsUnit:'jobs', svcBook:'Book this assistant', myOrdersT:'My requests',
   ordPending:'Submitted, awaiting assistant', histOrd:'Request',
   ordTitle:'Book assistant', ordSvcT:'Choose a service', ordNotePh:'Optional notes: target clinic, timing, etc.',
-  ordSubmit:'Submit request', ordOkT:'Request submitted', ordOkD:'The assistant will contact you within 2 hours (demo). Saved to Files.', ordDone:'Done',
+  ordSubmit:'Submit request', ordOkT:'Request submitted', ordOkD:'Funds held in escrow; the assistant will contact you within 2 hours (demo). Manage record access or confirm completion in your requests.', ordDone:'Done',
   joinT:'Are you a patient advocate?', joinHint:'Open your online office on FamilyHealth: set your own prices while our AI preps records and runs routine bookings so you can serve more families. ID check and HIPAA training required.',
   btnJoin:'Apply to open an office', lbJName:'Name', lbJCity:'City', lbJLang:'Languages', lbJSpec:'Specialties', lbJBio:'Short bio',
   btnJoinSubmit:'Submit application', jOk:'Application received; we will review and activate (demo)',
+  astL:'Assistant',
+  authT:'Record access', authNone:'No access', authBasic:'Chief complaint + insurance', authFull:'Full patient summary',
+  authHint:'Valid for the request period + 7 days. Revocable anytime; every view is logged.',
+  authScope:'Access', authUntil:'until', authViews:n=>`viewed ${n}x`, authRevoked:'Access revoked', revokedToast:'Access revoked; the assistant can no longer view',
+  avBtn:'View as assistant', revokeBtn:'Revoke access', revokeAsk:'The assistant will immediately lose access to this record. Confirm?',
+  avBanner:(n,d)=>`Authorized view · Read-only · Assistant ${n} · valid until ${d}`,
+  avRevokedT:'Access no longer valid', avRevokedD:'The patient revoked access or it expired. This record cannot be viewed.',
+  payT:'Confirm payment', paySvcL:'Service',
+  escrowHint:'Funds are held in escrow and released to the assistant only after you confirm completion (20% platform fee included). No real charge in this demo.',
+  payBtn:p=>`Pay by card $${p} (demo)`, payBack:'Back to edit',
+  escrowHeld:'Held in escrow', escrowReleased:'Completed · Paid out to assistant',
+  confirmDone:'Confirm done, release funds', releaseAsk:p=>`Confirm the service is complete? $${p} will be paid to the assistant.`, releasedToast:p=>`Released $${p} to the assistant (demo)`,
+  memBanner:'Upgrade to FamilyHealth Family Plan', memBannerVip:'Family member · Unlocked in beta',
+  memTitle:'Membership', memFree:'Free', memVip:'Family',
+  memRows:[['Family members','2','Unlimited'],['AI auto-booking','1 / mo','Unlimited'],['Report insights','—','✓'],['Summary languages','ZH + EN','ZH/EN/ES+'],['Assistant requests','Standard','5% off']],
+  memPriceLine:'Solo $9.99/mo · Family $19.99/mo · 20% off annual',
+  memBtnFam:'Upgrade Family $19.99/mo', memBtnSolo:'Solo $9.99/mo',
+  memOk:'Free during beta. All member features unlocked. From $9.99/mo at launch.',
+  memOkToast:'Free during beta; member features unlocked',
+  memNote:'Demo only. No real charges; click data stays on this device.',
+  walletT:'Wallet', balL:'Balance', topupBtn:'Top up',
+  topupBonus:'Add $200, get $10 free · No real charges in this demo', txnT:'Activity',
+  txnMap:{topup:'Top-up', pay:'Request payment', refund:'Complaint refund'},
+  topupOk:a=>`Added $${a} (demo)`,
+  payBalBtn:p=>`Pay $${p} from balance`, balNow:b=>`Balance: $${b}`, balLow:'Insufficient balance', goTopup:'Top up',
+  compBtn:'File a complaint', compT:'File a complaint',
+  compReasons:['Not completed as agreed','Attitude / conduct','Billing dispute','Other'],
+  compNotePh:'Optional details', compSubmit:'Submit complaint',
+  compOkT:'Complaint received', compOkD:'The platform will step in within 24 hours; escrowed funds are frozen and will not be paid out during review (demo).',
+  compStatus:'Complaint under review · Platform involved', compResolved:'Resolved · Refunded',
+  judgeBtn:'(Demo) Simulate ruling: refund', judgeToast:a=>`Ruled: $${a} refunded to wallet`,
+  escrowFrozen:'Funds frozen (complaint under review)', escrowRefunded:'Refunded to wallet',
   recGen:'Generate Patient Summary', basic:'Basic Info',
   lbName:'Name', lbBirth:'Birth Year', lbSex:'Sex', lbBlood:'Blood Type', lbMarital:'Marital Status', lbAddr:'Address',
   lbAllergy:'Allergies', lbMeds:'Medications', lbChronic:'Chronic Conditions', lbFamily:'Family History',
@@ -939,7 +1080,7 @@ function switchTab(t){
   });
   if(t==='book') $('bookDot').classList.remove('show');
   if(t==='rec') renderRecords();
-  if(t==='svc'){ renderAsts(); renderOrders(); }
+  if(t==='svc'){ renderAsts(); renderOrders(); renderWalletBar(); }
 }
 function startBooking(){
   switchTab('book');
@@ -1267,7 +1408,7 @@ function renderRecList(){
   let h = '';
   const ords = mget('orders') || [];
   h += ords.map(o=>
-    `<div class="ritem"><div><div>${l.histOrd} · ${o.an} · ${o.svc}</div><div class="rsub">${new Date(o.ts).toLocaleString(dloc)} · ${l.ordPending}</div></div><span></span></div>`
+    `<div class="ritem"><div><div>${l.histOrd} · ${o.an} · ${o.svc}</div><div class="rsub">${new Date(o.ts).toLocaleString(dloc)} · ${o.escrow==='released' ? l.escrowReleased : l.escrowHeld}</div></div><span></span></div>`
   ).join('');
   h += asks.map((a,i)=>
     `<div class="ritem"><div><div>${l.histAsk} · ${spName(a.it.specialty)||''}${a.it.reason?' · '+a.it.reason:''}</div><div class="rsub">${new Date(a.ts).toLocaleString(dloc)} · ${a.it.urgency||''}</div></div><button onclick="delAsk(${i})">${l.del}</button></div>`
@@ -1437,16 +1578,22 @@ function checkDue(){
 }
 
 /* ---- 病历首页(永远中英双语) ---- */
-function openDocView(){
+function openDocView(av){
+  const l = L();
+  if(av && !authActive(av)){
+    $('dv-body').innerHTML = `<div style="text-align:center;padding:70px 20px;"><h2 style="font-family:var(--disp);font-size:18px;">${l.avRevokedT}</h2><p style="font-size:13px;color:#666;margin-top:10px;line-height:1.7;">${l.avRevokedD}</p></div>`;
+    $('docview').classList.remove('hidden');
+    document.body.style.overflow = 'hidden';
+    return;
+  }
   const bk = mget('bookings') || [];
   const latest = asks[0];
   const age = profile.birth ? (new Date().getFullYear() - parseInt(profile.birth,10)) : null;
   const byCat = {};
   docs.forEach(d=>{ (byCat[d.cat] = byCat[d.cat] || []).push(d); });
   const NA = '未填写 N/A';
-  $('dv-body').innerHTML = `
-    <h2>病历首页 · Patient Summary</h2>
-    <p class="dv-sub">由 FamilyHealth 根据患者档案整理 Compiled by FamilyHealth from patient records · ${new Date().toLocaleDateString('zh-CN')} · 供就诊参考,非诊断文书 For clinical reference only</p>
+  const banner = av ? `<div style="background:var(--amber-soft);color:var(--amber-deep);font-size:11px;padding:9px 12px;border-radius:8px;margin-bottom:14px;text-align:center;line-height:1.6;">${l.avBanner(av.an, new Date(av.until).toLocaleDateString('zh-CN'))}</div>` : '';
+  const secInfo = `
     <div class="dv-sec"><h4>患者信息 Patient Information</h4>
       <div class="dv-row"><b>姓名 Name</b><span>${profile.name||NA}</span></div>
       <div class="dv-row"><b>性别 / 年龄 Sex / Age</b><span>${bi(SEXL,profile.sex)||NA}${age?' / '+age:''}</span></div>
@@ -1454,10 +1601,12 @@ function openDocView(){
       <div class="dv-row"><b>婚姻状况 Marital</b><span>${bi(MARL,profile.marital)||NA}</span></div>
       <div class="dv-row"><b>地址 Address</b><span>${profile.addr||NA}</span></div>
       <div class="dv-row"><b>保险 Insurance</b><span>${(latest&&latest.it.insurance)||intent.insurance||NA}</span></div>
-    </div>
+    </div>`;
+  const secCC = `
     <div class="dv-sec"><h4>主诉 Chief Complaint</h4>
       <div class="dv-row"><span>${latest ? ((latest.it.reason||spBi(latest.it.specialty))+(latest.it.urgency?' · 紧急程度 Urgency: '+latest.it.urgency:'')) : '暂无问诊记录 No consultations yet'}</span></div>
-    </div>
+    </div>`;
+  const secRest = `
     <div class="dv-sec"><h4>近期问诊记录 Recent Consultations</h4>
       ${asks.length ? asks.slice(0,5).map(a=>`<div class="dv-row"><b>${new Date(a.ts).toLocaleDateString('zh-CN')}</b><span>${spBi(a.it.specialty)||''}${a.it.reason?' · '+a.it.reason:''}</span></div>`).join('') : '<div class="dv-row"><span>无 None</span></div>'}
     </div>
@@ -1471,12 +1620,71 @@ function openDocView(){
     <div class="dv-sec"><h4>资料附件 Attachments(${docs.length})</h4>
       ${docs.length ? Object.entries(byCat).map(([c,arr])=>`<p class="dv-cat">${catBi(c)}(${arr.length})</p><div class="dv-imgs">${arr.map(d=>`<figure><img src="${d.img}"><figcaption>${catBi(c)} · ${new Date(d.ts).toLocaleDateString('zh-CN')}</figcaption></figure>`).join('')}</div>`).join('') : '<div class="dv-row"><span>无 None</span></div>'}
     </div>`;
+  $('dv-body').innerHTML = banner + `
+    <h2>病历首页 · Patient Summary</h2>
+    <p class="dv-sub">由 FamilyHealth 根据患者档案整理 Compiled by FamilyHealth from patient records · ${new Date().toLocaleDateString('zh-CN')} · 供就诊参考,非诊断文书 For clinical reference only</p>`
+    + secInfo + secCC + ((av && av.auth==='basic') ? '' : secRest);
   $('docview').classList.remove('hidden');
   document.body.style.overflow = 'hidden';
 }
 function closeDocView(){
   $('docview').classList.add('hidden');
   document.body.style.overflow = '';
+}
+
+/* ================= 钱包 ================= */
+function wget(){ return store.get('wallet') || {bal:0, txns:[]}; }
+function wset(w){ store.set('wallet', w); }
+function addTxn(w, type, amt){ w.txns.unshift({ts:Date.now(), type, amt}); }
+function renderWalletBar(){
+  const b = $('walletBal'); if(!b) return;
+  b.textContent = '$' + wget().bal;
+  $('walletL').textContent = L().balL;
+  $('btnTopup').textContent = L().topupBtn;
+}
+function renderWallet(){
+  const l = L(); const w = wget();
+  $('wvTitle').textContent = l.walletT;
+  $('wvBalL').textContent = l.balL;
+  $('wvBal').textContent = '$' + w.bal;
+  $('wvOpts').innerHTML = [50,100,200].map(a=>`<span class="svcchip pick" onclick="fakeTopup(${a})">+ $${a}${a>=200?' (+$10)':''}</span>`).join('');
+  $('wvBonus').textContent = l.topupBonus;
+  $('wvTxnT').textContent = l.txnT;
+  const dloc = LANG==='zh' ? 'zh-CN' : 'en-US';
+  $('wvTxns').innerHTML = w.txns.length ? w.txns.map(t=>
+    `<div class="ritem"><div><div>${l.txnMap[t.type]||t.type}</div><div class="rsub">${new Date(t.ts).toLocaleString(dloc)}</div></div><span style="font-weight:600;${t.type==='pay'?'':'color:var(--green-deep);'}">${t.type==='pay'?'-':'+'}$${t.amt}</span></div>`
+  ).join('') : `<p class="rhint" style="margin:0;">—</p>`;
+}
+function openWallet(){
+  renderWallet();
+  $('walletview').classList.remove('hidden');
+  document.body.style.overflow = 'hidden';
+}
+function closeWallet(){
+  $('walletview').classList.add('hidden');
+  document.body.style.overflow = $('ordview').classList.contains('hidden') ? '' : 'hidden';
+  renderWalletBar();
+  if(!$('ordview').classList.contains('hidden') && !$('ordPay').classList.contains('hidden')) refreshPayBal();
+}
+function fakeTopup(a){
+  const w = wget();
+  const total = a + (a>=200 ? 10 : 0);
+  w.bal += total; addTxn(w,'topup',total); wset(w);
+  renderWallet(); renderWalletBar();
+  toast(L().topupOk(total));
+}
+function refreshPayBal(){
+  const l = L(); const bal = wget().bal;
+  const p = pendOrd ? pendOrd.price : 0;
+  const btn = $('btnPayBal');
+  if(bal >= p && p > 0){
+    btn.classList.remove('hidden');
+    btn.textContent = l.payBalBtn(p);
+    $('payBalInfo').textContent = l.balNow(bal);
+  }else{
+    btn.classList.add('hidden');
+    $('payBalInfo').innerHTML = `${l.balNow(bal)} · ${l.balLow} <button class="olink" onclick="openWallet()">${l.goTopup}</button>`;
+  }
 }
 
 /* ================= 真人助理 Office ================= */
@@ -1497,7 +1705,8 @@ const ASTS = [
    city:{zh:'纽约',en:'New York'}, langs:{zh:'英文',en:'English'},
    spec:{zh:'保险争议 · 账单谈判',en:'Insurance disputes · Billing'}}
 ];
-let curAst = null, ordSvcIdx = 0;
+let curAst = null, ordSvcIdx = 0, ordAuthIdx = 1, pendOrd = null;
+const AUTH_OPTS = ['none','basic','full'];
 function renderAsts(){
   const l = L();
   const el = $('astList'); if(!el) return;
@@ -1516,7 +1725,10 @@ function renderAsts(){
     </div>`).join('');
 }
 function openOrd(i){
-  curAst = ASTS[i]; ordSvcIdx = 0;
+  curAst = ASTS[i]; ordSvcIdx = 0; ordAuthIdx = 1;
+  const l = L();
+  $('authChips').innerHTML = [l.authNone, l.authBasic, l.authFull].map((t,j)=>`<span class="svcchip pick ${j===1?'sel':''}" onclick="pickAuth(${j})">${t}</span>`).join('');
+  $('ordPay').classList.add('hidden');
   $('ordAst').textContent = curAst.n;
   $('ordForV').textContent = curName();
   $('ordChips').innerHTML = SVCS.map((s,j)=>`<span class="svcchip pick ${j===0?'sel':''}" onclick="pickSvc(${j})">${s[LANG]} $${s.p}</span>`).join('');
@@ -1532,12 +1744,120 @@ function pickSvc(j){
 }
 function submitOrd(){
   const s = SVCS[ordSvcIdx];
-  const orders = mget('orders') || [];
-  orders.unshift({id:Date.now(), an:curAst.n, svc:`${s[LANG]} $${s.p}`, note:$('ordNote').value.trim(), ts:Date.now()});
-  mset('orders', orders);
+  const l = L();
+  pendOrd = {id:Date.now(), an:curAst.n, svc:`${s[LANG]} $${s.p}`, price:s.p,
+    note:$('ordNote').value.trim(), auth:AUTH_OPTS[ordAuthIdx], ts:Date.now()};
+  $('payAstV').textContent = curAst.n;
+  $('payForV').textContent = curName();
+  $('paySvcV').textContent = `${s[LANG]} · $${s.p}`;
+  $('btnPay').textContent = l.payBtn(s.p);
   $('ordMain').classList.add('hidden');
+  $('ordPay').classList.remove('hidden');
+  refreshPayBal();
+}
+function pickAuth(j){
+  ordAuthIdx = j;
+  [...$('authChips').children].forEach((c,i)=>c.classList.toggle('sel', i===j));
+}
+function payBack(){
+  $('ordPay').classList.add('hidden');
+  $('ordMain').classList.remove('hidden');
+}
+function finalizeOrd(){
+  pendOrd.escrow = 'held';
+  if(pendOrd.auth !== 'none'){
+    pendOrd.until = pendOrd.ts + 7*86400000;
+    pendOrd.views = [];
+    pendOrd.revoked = false;
+  }
+  const orders = mget('orders') || [];
+  orders.unshift(pendOrd); mset('orders', orders);
+  pendOrd = null;
+  $('ordPay').classList.add('hidden');
   $('ordOk').classList.remove('hidden');
   renderOrders();
+}
+function payOrd(){ if(!pendOrd) return; finalizeOrd(); }
+function payOrdBal(){
+  if(!pendOrd) return;
+  const w = wget();
+  if(w.bal < pendOrd.price){ refreshPayBal(); return; }
+  w.bal -= pendOrd.price; addTxn(w,'pay',pendOrd.price); wset(w);
+  renderWalletBar();
+  finalizeOrd();
+}
+function authActive(o){
+  return o.auth && o.auth!=='none' && !o.revoked && Date.now() < o.until;
+}
+function revokeAuth(id){
+  const orders = mget('orders') || [];
+  const o = orders.find(x=>x.id===id); if(!o) return;
+  if(!confirm(L().revokeAsk)) return;
+  o.revoked = true; mset('orders', orders);
+  renderOrders(); toast(L().revokedToast);
+}
+function releaseOrd(id){
+  const orders = mget('orders') || [];
+  const o = orders.find(x=>x.id===id); if(!o) return;
+  if(!confirm(L().releaseAsk(o.price))) return;
+  o.escrow = 'released'; mset('orders', orders);
+  renderOrders(); toast(L().releasedToast(o.price));
+}
+let compOrderId = null, compIdx = 0;
+function openComp(id){
+  const l = L();
+  const orders = mget('orders') || [];
+  const o = orders.find(x=>x.id===id); if(!o) return;
+  compOrderId = id; compIdx = 0;
+  $('compOrd').textContent = `${o.an} · ${o.svc}`;
+  $('compChips').innerHTML = l.compReasons.map((r,j)=>`<span class="svcchip pick ${j===0?'sel':''}" onclick="pickComp(${j})">${r}</span>`).join('');
+  $('compNote').value = '';
+  $('compMain').classList.remove('hidden');
+  $('compOk').classList.add('hidden');
+  $('compview').classList.remove('hidden');
+  document.body.style.overflow = 'hidden';
+}
+function pickComp(j){
+  compIdx = j;
+  [...$('compChips').children].forEach((c,i)=>c.classList.toggle('sel', i===j));
+}
+function submitComp(){
+  const l = L();
+  const orders = mget('orders') || [];
+  const o = orders.find(x=>x.id===compOrderId); if(!o) return;
+  o.comp = {reason:l.compReasons[compIdx], note:$('compNote').value.trim(), ts:Date.now(), status:'reviewing'};
+  mset('orders', orders);
+  $('compMain').classList.add('hidden');
+  $('compOk').classList.remove('hidden');
+  renderOrders();
+}
+function closeComp(){
+  $('compview').classList.add('hidden');
+  document.body.style.overflow = '';
+}
+function judgeComp(id){
+  const orders = mget('orders') || [];
+  const o = orders.find(x=>x.id===id); if(!o || !o.comp) return;
+  o.comp.status = 'resolved';
+  if(o.escrow === 'held'){
+    o.escrow = 'refunded';
+    const w = wget();
+    w.bal += o.price; addTxn(w,'refund',o.price); wset(w);
+    renderWalletBar();
+  }
+  mset('orders', orders);
+  renderOrders();
+  toast(L().judgeToast(o.price));
+}
+function openAV(id){
+  const orders = mget('orders') || [];
+  const o = orders.find(x=>x.id===id); if(!o) return;
+  if(authActive(o)){
+    (o.views = o.views || []).push(Date.now());
+    mset('orders', orders);
+    renderOrders();
+  }
+  openDocView(o);
 }
 function closeOrd(){
   $('ordview').classList.add('hidden');
@@ -1548,9 +1868,47 @@ function renderOrders(){
   const card = $('myOrdCard'); if(!card) return;
   const orders = mget('orders') || [];
   card.classList.toggle('hidden', !orders.length);
-  $('myOrdList').innerHTML = orders.map(o=>
-    `<div class="ritem"><div><div>${o.an} · ${o.svc}</div><div class="rsub">${new Date(o.ts).toLocaleString(LANG==='zh'?'zh-CN':'en-US')} · ${l.ordPending}</div></div><span></span></div>`
-  ).join('');
+  const dloc = LANG==='zh' ? 'zh-CN' : 'en-US';
+  $('myOrdList').innerHTML = orders.map(o=>{
+    const compOpen = o.comp && o.comp.status==='reviewing';
+    let esc;
+    if(o.escrow==='refunded') esc = l.escrowRefunded;
+    else if(o.escrow==='released') esc = l.escrowReleased;
+    else if(compOpen) esc = l.escrowFrozen;
+    else esc = l.escrowHeld;
+    const authName = o.auth==='full' ? l.authFull : l.authBasic;
+    let authLine = '';
+    if(o.auth && o.auth!=='none'){
+      authLine = o.revoked
+        ? `<div class="rsub">${l.authRevoked}</div>`
+        : `<div class="rsub">${l.authScope}: ${authName} · ${l.authUntil} ${new Date(o.until).toLocaleDateString(dloc)} · ${l.authViews((o.views||[]).length)}</div>`;
+    }
+    let compLine = '';
+    if(o.comp){
+      compLine = o.comp.status==='reviewing'
+        ? `<div class="rsub" style="color:#A32D2D;">${l.compStatus}</div>`
+        : `<div class="rsub">${l.compResolved}</div>`;
+    }
+    const btns = [];
+    if(o.auth && o.auth!=='none' && authActive(o)){
+      btns.push(`<button class="olink" onclick="openAV(${o.id})">${l.avBtn}</button>`);
+      btns.push(`<button class="olink red" onclick="revokeAuth(${o.id})">${l.revokeBtn}</button>`);
+    }
+    if(o.escrow==='held' && !o.comp){
+      btns.push(`<button class="olink" onclick="releaseOrd(${o.id})">${l.confirmDone}</button>`);
+      btns.push(`<button class="olink red" onclick="openComp(${o.id})">${l.compBtn}</button>`);
+    }
+    if(compOpen){
+      btns.push(`<button class="olink" onclick="judgeComp(${o.id})">${l.judgeBtn}</button>`);
+    }
+    return `<div class="ritem" style="align-items:flex-start;"><div style="min-width:0;">
+      <div>${o.an} · ${o.svc}</div>
+      <div class="rsub">${new Date(o.ts).toLocaleString(dloc)} · ${esc}</div>
+      ${authLine}
+      ${compLine}
+      ${btns.length?`<div style="display:flex;gap:14px;margin-top:6px;flex-wrap:wrap;">${btns.join('')}</div>`:''}
+    </div></div>`;
+  }).join('');
 }
 function toggleJoin(){ $('joinForm').classList.toggle('hidden'); }
 function submitJoin(){
@@ -1558,6 +1916,43 @@ function submitJoin(){
   toast(L().jOk);
   $('joinForm').classList.add('hidden');
   ['name','city','lang','spec','bio'].forEach(k=>{ $('jf-'+k).value=''; });
+}
+
+/* ================= 会员(假门) ================= */
+function updateMemBtn(){
+  const b = $('btnMem'); if(!b) return;
+  b.textContent = store.get('vip') ? L().memBannerVip : L().memBanner;
+}
+function renderMem(){
+  const l = L();
+  $('memTitle').textContent = l.memTitle;
+  $('memTable').innerHTML =
+    `<div class="mh"></div><div class="mh">${l.memFree}</div><div class="mh vip">${l.memVip}</div>`
+    + l.memRows.map(r=>`<div>${r[0]}</div><div>${r[1]}</div><div class="vip">${r[2]}</div>`).join('');
+  $('memPrice').textContent = l.memPriceLine;
+  $('btnMemFam').textContent = l.memBtnFam;
+  $('btnMemSolo').textContent = l.memBtnSolo;
+  $('memNote').textContent = l.memNote;
+  const vip = store.get('vip');
+  $('memOkMsg').classList.toggle('hidden', !vip);
+  if(vip) $('memOkMsg').textContent = l.memOk;
+}
+function openMem(){
+  renderMem();
+  $('memview').classList.remove('hidden');
+  document.body.style.overflow = 'hidden';
+}
+function closeMem(){
+  $('memview').classList.add('hidden');
+  document.body.style.overflow = '';
+}
+function fakeDoor(plan){
+  const fd = store.get('fd') || {family:0, solo:0};
+  fd[plan] = (fd[plan]||0) + 1;
+  store.set('fd', fd);
+  store.set('vip', plan);
+  renderMem(); updateMemBtn();
+  toast(L().memOkToast);
 }
 
 /* ================= 平台对接 ================= */
@@ -1675,6 +2070,22 @@ function applyLang(){
   $('ordOkT').textContent = l.ordOkT;
   $('ordOkD').textContent = l.ordOkD;
   $('btnOrdDone').textContent = l.ordDone;
+  $('authT').textContent = l.authT;
+  $('authHint').textContent = l.authHint;
+  $('payT').textContent = l.payT;
+  $('payAstL').textContent = l.astL;
+  $('payForL').textContent = l.icWho;
+  $('paySvcL').textContent = l.paySvcL;
+  $('escrowHint').textContent = l.escrowHint;
+  $('btnPayBack').textContent = l.payBack;
+  updateMemBtn();
+  $('compTitleT').textContent = l.compT;
+  $('compNote').placeholder = l.compNotePh;
+  $('btnCompSubmit').textContent = l.compSubmit;
+  $('compOkT').textContent = l.compOkT;
+  $('compOkD').textContent = l.compOkD;
+  $('btnCompDone').textContent = l.ordDone;
+  renderWalletBar();
   renderAsts(); renderOrders();
   renderMembers();
   if($('page-rec').classList.contains('on')) renderRecords();
